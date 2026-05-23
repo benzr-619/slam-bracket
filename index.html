@@ -509,9 +509,16 @@ function getNextSlot(ri,mi){const nri=ri+1;const d=activeDraw();if(!d||nri>=d.ro
 
 function placePickInNextRound(ri,mi){
   const d=activeDraw();if(!d)return;
-  const m=d.rounds[ri].matches[mi];const next=getNextSlot(ri,mi);if(!next)return;
-  const nm=d.rounds[next.nri].matches[next.nmi];
-  if(!nm.winner){nm[next.side]=m.pick?{name:m.pick,seed:findSeed(m.pick)}:{name:'',seed:''};}
+  const m=d.rounds[ri].matches[mi];const next=getNextSlot(ri,mi);
+  if(next){
+    const nm=d.rounds[next.nri].matches[next.nmi];
+    if(!nm.winner){nm[next.side]=m.pick?{name:m.pick,seed:findSeed(m.pick)}:{name:'',seed:''};}
+  }
+  // If this is the Final (no next slot), cascade pick to champion box
+  if(!next){
+    const cn=document.querySelector('.champ-name');
+    if(cn)cn.textContent=m.pick||'—';
+  }
 }
 
 function applyWinner(ri,mi,winnerName){
@@ -691,7 +698,8 @@ function renderBracket(){
   champDiv.style.left=champX+'px';champDiv.style.top=champY+'px';
   const champLbl=document.createElement('div');champLbl.className='champ-label';champLbl.textContent='Champion';
   const champNm=document.createElement('div');champNm.className='champ-name';
-  champNm.textContent=finMatch&&finMatch.winner?finMatch.winner:'—';
+  const finPick=finMatch&&(finMatch.winner||finMatch.pick)||'';
+  champNm.textContent=finPick||'—';
   champDiv.appendChild(champLbl);champDiv.appendChild(champNm);wrap.appendChild(champDiv);
   addLine(svg,finX+CW,finCY,champX,finCY,connColor);
 
@@ -944,26 +952,26 @@ function buildPrintHTML(d){
     const isCorrect=isPicked&&m.result==='correct';
     const isWrong=isPicked&&m.result==='wrong';
     const isElim=m.winner&&m.winner!==p.name&&p.name&&!isPicked;
-    let bg='',nameStyle='',seedColor='#999';
+    let bg='',nameStyle='',seedColor='#aaa';
     if(isCorrect){bg='#edf7ee';nameStyle='font-weight:700;color:#2d7a3a';seedColor='#2d7a3a';}
     else if(isWrong){bg='#fff0ee';nameStyle='color:#c0392b;text-decoration:line-through;opacity:0.6';}
     else if(isPicked){bg='#edf2fb';nameStyle='font-weight:700;color:#1a5fb4';seedColor='#1a5fb4';}
-    else if(isElim){nameStyle='opacity:0.28';}
+    else if(isElim){nameStyle='opacity:0.3';}
     const name=p.name||'—';
-    return '<div style="display:flex;align-items:center;gap:2px;padding:1px 3px;min-height:10px;border-bottom:0.3pt solid #eee;background:'+bg+'">'
-      +'<span style="font-family:monospace;font-size:6pt;color:'+seedColor+';min-width:8px;text-align:center;flex-shrink:0">'+escH(p.seed||'')+'</span>'
-      +'<span style="flex:1;font-size:6.5pt;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'+nameStyle+'">'+escH(name)+'</span>'
+    return '<div style="display:flex;align-items:center;gap:3px;padding:1.5px 4px;min-height:12px;border-bottom:0.3pt solid #e8e8e8;background:'+bg+'">'
+      +'<span style="font-family:monospace;font-size:7pt;color:'+seedColor+';min-width:10px;text-align:center;flex-shrink:0">'+escH(p.seed||'')+'</span>'
+      +'<span style="flex:1;font-size:7.5pt;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'+nameStyle+'">'+escH(name)+'</span>'
       +'</div>';
   }
 
   function cardHTML(m){
-    const borderColor=m.result==='correct'?'#2d7a3a':m.result==='wrong'?'#c0392b':m.watch?'#1a1916':'#ccc';
-    const leftBorder=m.watch?';border-left:2pt solid '+borderColor:'';
-    let html='<div style="border:0.4pt solid '+borderColor+leftBorder+';border-radius:1.5px;overflow:hidden;background:#fff;width:100%">'
+    const borderColor=m.result==='correct'?'#2d7a3a':m.result==='wrong'?'#c0392b':m.watch?'#c8900a':'#ccc';
+    const bw=m.watch&&!m.result?'1pt':'0.4pt';
+    let html='<div style="border:'+bw+' solid '+borderColor+';border-radius:2px;overflow:hidden;background:#fff;width:100%">'
       +playerRowHTML(m.p1,m)
       +playerRowHTML(m.p2,m);
     if(m.score){
-      html+='<div style="font-family:monospace;font-size:5pt;color:#999;padding:1px 3px;background:#f9f9f9;border-top:0.3pt solid #eee">'+escH(m.score)+'</div>';
+      html+='<div style="font-family:monospace;font-size:5.5pt;color:#999;padding:1px 4px;background:#f9f9f9;border-top:0.3pt solid #eee">'+escH(m.score)+'</div>';
     }
     html+='</div>';
     return html;
@@ -975,7 +983,7 @@ function buildPrintHTML(d){
   // Uses a flex-row of round columns, each a flex-col of match slots
   // Match slots use flex:1 so spacing is automatic — no JS math needed
   function halfHTML(startR1,endR1,showFinal){
-    const flex=[5,3.5,2.5,2,1.8,1.6];
+    const flex=[6,3.8,2.6,2,1.8,1.6];
     let cols='';
 
     for(let ri=0;ri<drawRounds;ri++){
@@ -1001,8 +1009,8 @@ function buildPrintHTML(d){
         // Both get right border to form the bracket arm
         let armStyle='';
         if(ri<drawRounds-1){
-          if(localMi%2===0) armStyle='border-right:0.5pt solid #bbb;border-bottom:0.5pt solid #bbb;';
-          else armStyle='border-right:0.5pt solid #bbb;border-top:0.5pt solid #bbb;';
+          if(localMi%2===0) armStyle='border-right:0.75pt solid #bbb;border-bottom:0.75pt solid #bbb;';
+          else armStyle='border-right:0.75pt solid #bbb;border-top:0.75pt solid #bbb;';
         }
 
         slots+='<div style="flex:1;min-height:0;display:flex;align-items:center;padding:1px 0;'+armStyle+'">'+cardHTML(m)+'</div>';
@@ -1013,7 +1021,7 @@ function buildPrintHTML(d){
       cols+='<div style="flex:'+flex[ri]+' 1 0;min-width:0;display:flex;flex-direction:column;height:100%;overflow:hidden">'+slots+'</div>';
 
       if(ri<drawRounds-1){
-        cols+='<div style="flex:0 0 2px;height:100%"></div>';
+        cols+='<div style="flex:0 0 3px;height:100%"></div>';
       }
     }
 
@@ -1021,13 +1029,13 @@ function buildPrintHTML(d){
     if(showFinal){
       const finRound=rounds[rounds.length-1];
       const finMatch=finRound&&finRound.matches[0];
-      const champName=finMatch&&finMatch.winner?finMatch.winner:'—';
-      cols+='<div style="flex:0 0 2px;display:flex;align-items:center"><div style="width:100%;border-top:0.5pt solid #bbb"></div></div>';
-      cols+='<div style="flex:0 0 26mm;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:3mm;padding-left:2px">'
+      const champName=finMatch&&(finMatch.winner||finMatch.pick)||'—';
+      cols+='<div style="flex:0 0 3px;display:flex;align-items:center"><div style="width:100%;border-top:0.75pt solid #bbb"></div></div>';
+      cols+='<div style="flex:0 0 28mm;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:4mm;padding-left:3px">'
         +(finMatch?cardHTML(finMatch):'')
-        +'<div style="border:1pt solid #111;border-radius:2px;padding:3px 5px;text-align:center">'
-        +'<div style="font-family:monospace;font-size:5.5pt;text-transform:uppercase;letter-spacing:0.08em;color:#666;margin-bottom:2px">Champion</div>'
-        +'<div style="font-family:Georgia,serif;font-size:9pt;font-weight:600">'+escH(champName)+'</div>'
+        +'<div style="border:1.5pt solid #222;border-radius:3px;padding:4px 6px;text-align:center">'
+        +'<div style="font-family:monospace;font-size:6pt;text-transform:uppercase;letter-spacing:0.1em;color:#666;margin-bottom:3px">Champion</div>'
+        +'<div style="font-family:Georgia,serif;font-size:10pt;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escH(champName)+'</div>'
         +'</div>'
         +'</div>';
     }
@@ -1038,15 +1046,15 @@ function buildPrintHTML(d){
 
 
   function roundLabelsHTML(showFinal){
-    const flex=[5,3.5,2.5,2,1.8,1.6];
-    let html='<div style="display:flex;width:100%;margin-bottom:2px;flex-shrink:0">';
+    const flex=[6,3.8,2.6,2,1.8,1.6];
+    let html='<div style="display:flex;width:100%;margin-bottom:3px;flex-shrink:0">';
     rounds.slice(0,drawRounds).forEach((r,ri)=>{
-      html+='<div style="flex:'+flex[ri]+' 1 0;text-align:center;font-family:monospace;font-size:5.5pt;text-transform:uppercase;letter-spacing:0.06em;color:#aaa;border-bottom:0.4pt solid #ddd;padding-bottom:1px">'+escH(r.label)+'</div>';
-      if(ri<drawRounds-1)html+='<div style="flex:0 0 2px"></div>';
+      html+='<div style="flex:'+flex[ri]+' 1 0;text-align:center;font-family:monospace;font-size:6.5pt;text-transform:uppercase;letter-spacing:0.06em;color:#999;border-bottom:0.5pt solid #ccc;padding-bottom:2px">'+escH(r.label)+'</div>';
+      if(ri<drawRounds-1)html+='<div style="flex:0 0 3px"></div>';
     });
     if(showFinal){
-      html+='<div style="flex:0 0 2px"></div>';
-      html+='<div style="flex:0 0 26mm;text-align:center;font-family:monospace;font-size:5.5pt;text-transform:uppercase;letter-spacing:0.06em;color:#aaa;border-bottom:0.4pt solid #ddd;padding-bottom:1px">Final</div>';
+      html+='<div style="flex:0 0 3px"></div>';
+      html+='<div style="flex:0 0 28mm;text-align:center;font-family:monospace;font-size:6.5pt;text-transform:uppercase;letter-spacing:0.06em;color:#999;border-bottom:0.5pt solid #ccc;padding-bottom:2px">Final</div>';
     }
     html+='</div>';
     return html;
@@ -1056,7 +1064,7 @@ function buildPrintHTML(d){
     return '<div style="width:408mm;height:282mm;overflow:hidden;display:flex;flex-direction:column;page-break-after:always;box-sizing:border-box;padding:0">'
       // Header
       +'<div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:0.75pt solid #888;padding-bottom:2px;margin-bottom:2px;flex-shrink:0">'
-      +'<span style="font-family:Georgia,serif;font-size:13pt;font-weight:600">'+escH(titleStr)+'</span>'
+      +'<span style="font-family:Georgia,serif;font-size:15pt;font-weight:600">'+escH(titleStr)+'</span>'
       +'<span style="font-family:monospace;font-size:6pt;color:#666">'+escH(pageLabel)+'</span>'
       +'</div>'
       +roundLabelsHTML(showFinal)
@@ -1070,7 +1078,7 @@ function buildPrintHTML(d){
   return '<!DOCTYPE html><html><head><meta charset="UTF-8">'
     +'<title>'+escH(titleStr)+'</title>'
     +'<style>'
-    +'@page{size:A3 landscape;margin:6mm}'
+    +'@page{size:A3 landscape;margin:8mm}'
     +'*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}'
     +'body{background:#fff;font-family:Arial,sans-serif}'
     +'@media screen{body{padding:10mm;background:#eee} div[style*="page-break"]{margin-bottom:10mm;box-shadow:0 2px 12px rgba(0,0,0,0.15);background:#fff}}'
