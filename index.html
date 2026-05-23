@@ -22,6 +22,7 @@
   --blue:#1a5fb4;--blue-bg:#edf2fb;--blue-border:#b0ccf0;
   --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;--serif:'Playfair Display',serif;
   --card-w:180px;
+  --watch:#c8900a;--watch-bg:#fef9ec;--watch-border:#f0d080;
 }
 body.theme-RG{--bg:#f8f2ee;--surface:#fff;--surface2:#f5ede6;--border:#e0cfc4;--border2:#c8b09e;--accent:#8b2615;--accent-dim:#fdf0ec;--accent-text:#fff}
 body.theme-WIM{--bg:#f2f6f3;--surface:#fff;--surface2:#eaf3ec;--border:#cce0ce;--border2:#a8c8ac;--accent:#1a5c2a;--accent-dim:#eaf3ec;--accent-text:#fff}
@@ -118,12 +119,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .bracket-body{flex:1;overflow:auto;padding:24px;background:var(--bg)}
 .bracket-svg-wrap{position:relative;display:inline-block}
 .bracket-svg-wrap svg{position:absolute;top:0;left:0;pointer-events:none;overflow:visible}
-.mc{position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;width:180px;transition:border-color 0.12s}
-.mc.watched{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-dim),inset 3px 0 0 var(--accent)}
-.mc-watch-btn{position:absolute;top:2px;right:2px;background:none;border:none;cursor:pointer;font-size:11px;line-height:1;padding:2px 3px;border-radius:3px;color:var(--text3);opacity:0;transition:opacity 0.15s,color 0.15s;z-index:3}
+.mc{position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:6px;width:180px;transition:border-color 0.12s;display:flex;flex-direction:column}
+.mc.watched{border:2px solid var(--watch-border)}
+.mc.watched.st-correct{border-color:var(--green-border)}
+.mc.watched.st-wrong{border-color:var(--red-border)}
+.mc-watch-btn{position:absolute;top:-16px;right:2px;background:none;border:none;cursor:pointer;font-size:11px;line-height:1;padding:2px 4px;border-radius:3px;color:var(--watch);opacity:0;transition:opacity 0.15s;z-index:3}
 .mc:hover .mc-watch-btn{opacity:1}
-.mc-watch-btn.active{opacity:1;color:var(--accent)}
-.mc-watch-btn:hover{color:var(--accent);background:var(--accent-dim)}
+.mc-watch-btn.active{color:var(--watch)}
+.mc-watch-btn:hover{background:var(--watch-bg)}
 .mc.st-correct{border-color:var(--green-border)}
 .mc.st-wrong{border-color:var(--red-border)}
 .pr{display:flex;align-items:center;gap:5px;padding:4px 7px;cursor:pointer;transition:background 0.1s;border-bottom:1px solid var(--border);min-height:26px;user-select:none}
@@ -149,7 +152,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 #epm-seed:focus,#epm-name:focus{border-color:var(--accent)!important;outline:none}
 .d-none{background:transparent;border:1px solid var(--border2)}
 .d-pick{background:var(--blue)}.d-ok{background:var(--green)}.d-bad{background:var(--red)}
-.mc-footer{display:flex;border-top:1px solid var(--border);background:var(--surface2)}
+.mc-footer{display:flex;border-top:1px solid var(--border);background:var(--surface2);border-radius:0 0 5px 5px;overflow:hidden}
 .mc-score{flex:1}
 .mc-score input{background:transparent;border:none;outline:none;font-family:var(--mono);font-size:9px;color:var(--text2);width:100%;padding:3px 7px}
 .mc-score input::placeholder{color:var(--text3)}
@@ -607,7 +610,7 @@ function renderBracket(){
   const r1=rounds[0].matches;
   const total=r1.length,half=Math.ceil(total/2),q=Math.ceil(half/2);
   const drawRounds=rounds.length-1;
-  const VGAP=8,CELL=CH+VGAP,Q_SEP=28,QQ_SEP=18;
+  const VGAP=32,CELL=CH+VGAP,Q_SEP=28,QQ_SEP=18;
 
   function r1YCenter(idx){
     let y=idx*CELL+CH/2;
@@ -751,7 +754,10 @@ function placeCard(m,ri,mi,x,y,wrap,rounds){
     if(p.name&&!isElim&&!m.winner&&m.result!=='correct'){row.addEventListener('click',()=>handlePickClick(ri,mi,p));}
     return row;
   }
-  card.appendChild(makeRow(m.p1,'p1'));card.appendChild(makeRow(m.p2,'p2'));
+  const rowsWrap=document.createElement('div');
+  rowsWrap.style.cssText='overflow:hidden;border-radius:5px 5px 0 0;flex-shrink:0';
+  rowsWrap.appendChild(makeRow(m.p1,'p1'));rowsWrap.appendChild(makeRow(m.p2,'p2'));
+  card.appendChild(rowsWrap);
 
   // Watch star button
   const watchBtn=document.createElement('button');
