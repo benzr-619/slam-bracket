@@ -307,19 +307,59 @@ function isOrigPick(m){
 }
 
 // ── SCORING ──
-const ROUND_PTS=[1,2,4,8,16,32,64];
+// Round config: base points + upset multiplier
+const ROUND_CONFIG=[
+  {base:1,mult:0.1},  // R1
+  {base:2,mult:0.2},  // R2
+  {base:3,mult:0.4},  // R3
+  {base:4,mult:0.6},  // R4
+  {base:5,mult:1.0},  // QF
+  {base:6,mult:1.5},  // SF
+  {base:7,mult:2.0},  // F
+];
 
-function getSeedVal(name,d){
-  for(const r of d.rounds)for(const m of r.matches){
-    if(m.p1.name===name){const s=parseInt(m.p1.seed);return(s>=1&&s<=32)?s:33;}
-    if(m.p2.name===name){const s=parseInt(m.p2.seed);return(s>=1&&s<=32)?s:33;}
+// Returns numeric seed for scoring: 1-32 = seeded, 33 = unseeded/Q/WC/LL
+function numericSeed(seedStr){
+  const n=parseInt(seedStr);
+  return(n>=1&&n<=32)?n:33;
+}
+
+// Calculate upset value for a match given winner and loser seed strings
+function calcUpsetValue(winnerSeedStr,loserSeedStr){
+  const ws=numericSeed(winnerSeedStr);
+  const ls=numericSeed(loserSeedStr);
+  const winnerSeeded=ws<=32;
+  const loserSeeded=ls<=32;
+
+  let upsetVal=0;
+  if(winnerSeeded&&loserSeeded){
+    // Both seeded: upset only if winner seed number > loser seed number
+    upsetVal=ws>ls?ws-ls:0;
+  } else if(winnerSeeded&&!loserSeeded){
+    // Seeded beats unseeded: chalk, no bonus
+    upsetVal=0;
+  } else if(!winnerSeeded&&loserSeeded){
+    // Unseeded beats seeded: true upset
+    upsetVal=33-ls;
+  } else {
+    // Unseeded vs unseeded: flat coin-flip bonus
+    upsetVal=5;
   }
-  return 33;
+  return Math.min(upsetVal,25); // cap at 25
+}
+
+// Calculate score for one correct original pick
+function calcMatchScore(m,ri){
+  const cfg=ROUND_CONFIG[ri]||ROUND_CONFIG[0];
+  const loser=m.winner===m.p1.name?m.p2:m.p1;
+  const winner=m.winner===m.p1.name?m.p1:m.p2;
+  const upsetVal=calcUpsetValue(winner.seed,loser.seed);
+  const skillBonus=parseFloat((cfg.mult*upsetVal).toFixed(2));
+  return{base:cfg.base,skill:skillBonus};
 }
 
 function calcStats(d){
-  // returns { filled, total, cOrig, wOrig, cBackup, wBackup, pts, bonus }
-  let filled=0,total=0,cOrig=0,wOrig=0,cBackup=0,wBackup=0,pts=0,bonus=0;
+  let filled=0,total=0,cOrig=0,wOrig=0,cBackup=0,wBackup=0,baseScore=0,skillBonus=0;
   d.rounds.forEach((r,ri)=>r.matches.forEach(m=>{
     if(!m.p1.name&&!m.p2.name)return;
     total++;
@@ -327,23 +367,27 @@ function calcStats(d){
     if(!m.winner)return;
     const backup=isBackupPick(m);
     if(!backup){
-      // original pick outcome
-      if(m.result==='correct'){cOrig++;pts+=ROUND_PTS[ri]||1;bonus+=getSeedVal(m.winner,d);}
-      else if(m.result==='wrong')wOrig++;
+      if(m.result==='correct'){
+        cOrig++;
+        const sc=calcMatchScore(m,ri);
+        baseScore+=sc.base;
+        skillBonus+=sc.skill;
+      } else if(m.result==='wrong'){
+        wOrig++;
+      }
     } else {
-      // backup pick outcome — compare pick to winner
       if(m.pick===m.winner)cBackup++;
       else wBackup++;
     }
   }));
-  return{filled,total,cOrig,wOrig,cBackup,wBackup,pts,bonus};
+  return{filled,total,cOrig,wOrig,cBackup,wBackup,baseScore,skillBonus};
 }
 
 function renderStats(){
   const strip=$('stats-strip');if(!strip)return;
   const d=activeDraw();
   strip.innerHTML='';
-  if(!d){return;}
+  if(!d)return;
   const s=calcStats(d);
   const locked=d.locked;
 
@@ -357,20 +401,18 @@ function renderStats(){
   }
 
   if(!locked){
-    // Unlocked: just show fill progress
     const pct=s.total>0?Math.round(s.filled/s.total*100):0;
     pill('picks filled',s.filled+' / '+s.total);
-    pill('','pct filled: '+pct+'%');
+    pill('complete',pct+'%');
   } else {
-    // Locked: show scoring and accuracy
     const origRes=s.cOrig+s.wOrig;
     const allRes=s.cOrig+s.wOrig+s.cBackup+s.wBackup;
-    const allC=s.cOrig+s.cBackup;
     const bracketAcc=origRes>0?Math.round(s.cOrig/origRes*100)+'%':'—';
-    const matchAcc=allRes>0?Math.round(allC/allRes*100)+'%':'—';
-    pill('pts',s.pts);
-    pill('upset bonus','+'+s.bonus);
-    pill('total',s.pts+s.bonus,'vg');
+    const matchAcc=allRes>0?Math.round((s.cOrig+s.cBackup)/allRes*100)+'%':'—';
+    const total=(s.baseScore+s.skillBonus).toFixed(1);
+    pill('base',s.baseScore);
+    pill('skill bonus','+'+s.skillBonus.toFixed(1));
+    pill('total',total,'vg');
     divider();
     pill('bracket acc',bracketAcc);
     pill('match acc',matchAcc);
