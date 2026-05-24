@@ -354,7 +354,7 @@ function calcUpsetValue(winnerSeedStr,loserSeedStr){
     // Unseeded vs unseeded: flat coin-flip bonus
     upsetVal=5;
   }
-  return Math.min(upsetVal,25); // cap at 25
+  return upsetVal;
 }
 
 // Calculate score for one correct original pick
@@ -427,7 +427,7 @@ function renderStats(){
     const matchAcc=allRes>0?Math.round((s.cOrig+s.cBackup)/allRes*100)+'%':'—';
     const total=(s.baseScore+s.skillBonus).toFixed(1);
     pill('base',s.baseScore,'','Points for correct original picks. Increases each round: 1pt in R1 up to 7pts in the Final.');
-    pill('skill bonus','+'+s.skillBonus.toFixed(1),'','Upset reward: round multiplier × upset value based on seeding. Bigger upsets in later rounds score more. Capped at 25 upset value per match.');
+    pill('skill bonus','+'+s.skillBonus.toFixed(1),'','Upset reward: round multiplier × upset value based on seeding. Bigger upsets in later rounds score more. A shocking R1 upset scores differently than a late-round one.');
     pill('total',total,'vg','Base + skill bonus combined. Your overall bracket performance score.');
     divider();
     pill('bracket acc',bracketAcc,'','How often your pre-tournament picks were right. Only counts matches you predicted before locking.');
