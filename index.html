@@ -20,9 +20,8 @@
   --green:#2d7a3a;--green-bg:#edf7ee;--green-border:#a8d4ae;
   --red:#c0392b;--red-bg:#fdf0ee;--red-border:#f0b8b2;
   --blue:#1a5fb4;--blue-bg:#edf2fb;--blue-border:#b0ccf0;
+  --purple:#6b3fa0;--purple-bg:#f3edfb;--purple-border:#c8a8e8;
   --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;--serif:'Playfair Display',serif;
-  --card-w:180px;
-  --watch:#c8900a;--watch-bg:#fef9ec;--watch-border:#f0d080;
 }
 body.theme-RG{--bg:#f8f2ee;--surface:#fff;--surface2:#f5ede6;--border:#e0cfc4;--border2:#c8b09e;--accent:#8b2615;--accent-dim:#fdf0ec;--accent-text:#fff}
 body.theme-WIM{--bg:#f2f6f3;--surface:#fff;--surface2:#eaf3ec;--border:#cce0ce;--border2:#a8c8ac;--accent:#1a5c2a;--accent-dim:#eaf3ec;--accent-text:#fff}
@@ -33,7 +32,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .screen{display:none;min-height:100vh}
 .screen.active{display:flex;flex-direction:column}
 
-/* UPLOAD */
+/* ── UPLOAD ── */
 #screen-upload{align-items:center;justify-content:center;padding:2rem}
 .upload-container{width:100%;max-width:480px}
 .wordmark{font-family:var(--mono);font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text3);margin-bottom:3rem}
@@ -55,12 +54,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .btn-primary:disabled{opacity:0.3;cursor:not-allowed}
 .btn-secondary{background:var(--surface);border:1px solid var(--border2);color:var(--text);padding:7px 13px;border-radius:6px;font-family:var(--sans);font-size:13px;cursor:pointer;transition:all 0.15s}
 .btn-secondary:hover{border-color:var(--accent);background:var(--accent-dim)}
-.btn-danger{background:var(--surface);border:1px solid var(--red-border);color:var(--red);padding:7px 13px;border-radius:6px;font-family:var(--sans);font-size:13px;cursor:pointer;transition:all 0.15s}
-.btn-danger:hover{background:var(--red-bg)}
+.btn-lock-on{background:var(--red-bg)!important;border-color:var(--red-border)!important;color:var(--red)!important}
 .parse-status{margin-top:.75rem;padding:10px 12px;background:var(--surface2);border-radius:7px;border:1px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--text2);display:none;line-height:1.9;white-space:pre-wrap}
 .divider{height:1px;background:var(--border);margin:18px 0}
-
-/* existing draws on upload screen */
 .existing-draws{margin-bottom:1.5rem}
 .existing-draws-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.15em;color:var(--text3);margin-bottom:8px}
 .draw-pill{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:7px;margin-bottom:6px;cursor:pointer;transition:all 0.15s}
@@ -70,7 +66,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .draw-pill-del{font-size:12px;color:var(--text3);padding:2px 6px;border-radius:4px;border:none;background:none;cursor:pointer;line-height:1}
 .draw-pill-del:hover{color:var(--red);background:var(--red-bg)}
 
-/* EDIT */
+/* ── EDIT SCREEN ── */
 #screen-edit{flex-direction:column;background:var(--bg)}
 .edit-header{background:var(--surface);border-bottom:1px solid var(--border);padding:13px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}
 .edit-title{font-size:12px;font-family:var(--mono);color:var(--text2)}
@@ -87,10 +83,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .add-match-btn{background:none;border:1.5px dashed var(--border2);color:var(--text3);padding:6px 13px;border-radius:5px;font-family:var(--mono);font-size:10px;cursor:pointer;margin-top:4px}
 .add-match-btn:hover{border-color:var(--accent);color:var(--text2)}
 
-/* BRACKET */
+/* ── BRACKET ── */
 #screen-bracket{flex-direction:column;background:var(--bg)}
-
-/* TABS */
 .tabs-bar{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:stretch;flex-shrink:0;overflow-x:auto}
 .tab{display:flex;align-items:center;gap:6px;padding:0 18px;height:44px;font-size:12px;font-family:var(--mono);color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.15s;border-top:none;border-left:none;border-right:none;background:none}
 .tab:hover{color:var(--text);background:var(--surface2)}
@@ -102,66 +96,87 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .tab-close{font-size:14px;color:var(--text3);padding:2px 4px;border-radius:3px;border:none;background:none;cursor:pointer;line-height:1;margin-left:2px}
 .tab-close:hover{color:var(--red);background:var(--red-bg)}
 
-/* BRACKET HEADER */
-.bracket-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:stretch;flex-shrink:0;height:48px}
-.bracket-title{display:flex;align-items:center;gap:10px;padding-right:22px;border-right:1px solid var(--border)}
+/* ── BRACKET HEADER ── */
+.bracket-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:stretch;flex-shrink:0;height:52px;gap:0}
+.bracket-title{display:flex;align-items:center;padding-right:20px;border-right:1px solid var(--border);flex-shrink:0}
 .slam-name{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--accent)}
 .draw-name{font-size:11px;color:var(--text3);font-family:var(--mono)}
-.stats-strip{display:flex;align-items:center;flex:1;padding:0 14px}
-.stat-pill{display:flex;align-items:center;gap:6px;padding:0 14px;border-right:1px solid var(--border);height:100%}
-.stat-pill:first-child{padding-left:0}
-.slbl{color:var(--text3);font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.08em}
+.stats-strip{display:flex;align-items:center;flex:1;padding:0 4px;overflow:hidden;gap:0}
+.stat-pill{display:flex;align-items:center;gap:5px;padding:0 14px;border-right:1px solid var(--border);height:100%;flex-shrink:0}
+.stat-pill:first-child{padding-left:14px}
+.stat-divider{width:1px;background:var(--border2);height:60%;flex-shrink:0;margin:0 4px}
+.slbl{color:var(--text3);font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap}
 .sval{font-family:var(--mono);font-size:15px;font-weight:500}
+.sval-sm{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text2)}
 .vg{color:var(--green)}.vr{color:var(--red)}
-.header-actions{display:flex;align-items:center;gap:8px;padding-left:14px}
+.header-actions{display:flex;align-items:center;gap:8px;padding-left:14px;flex-shrink:0}
 
-/* BRACKET BODY */
+/* ── BRACKET BODY ── */
 .bracket-body{flex:1;overflow:auto;padding:24px;background:var(--bg)}
 .bracket-svg-wrap{position:relative;display:inline-block}
 .bracket-svg-wrap svg{position:absolute;top:0;left:0;pointer-events:none;overflow:visible}
-.mc{position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:6px;width:180px;transition:border-color 0.12s;display:flex;flex-direction:column}
-.mc.watched{border:2px solid var(--watch-border)}
-.mc.watched.st-correct{border-color:var(--green-border)}
-.mc.watched.st-wrong{border-color:var(--red-border)}
-.mc-watch-btn{position:absolute;top:-16px;right:2px;background:none;border:none;cursor:pointer;font-size:11px;line-height:1;padding:2px 4px;border-radius:3px;color:var(--watch);opacity:0;transition:opacity 0.15s;z-index:3}
-.mc:hover .mc-watch-btn{opacity:1}
-.mc-watch-btn.active{color:var(--watch)}
-.mc-watch-btn:hover{background:var(--watch-bg)}
+
+/* ── MATCH CARD ── */
+.mc{position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:6px;width:180px;display:flex;flex-direction:column;transition:border-color 0.12s}
 .mc.st-correct{border-color:var(--green-border)}
 .mc.st-wrong{border-color:var(--red-border)}
+
+/* player row */
 .pr{display:flex;align-items:center;gap:5px;padding:4px 7px;cursor:pointer;transition:background 0.1s;border-bottom:1px solid var(--border);min-height:26px;user-select:none}
 .pr:last-of-type{border-bottom:none}
 .pr.no-pick{cursor:default}
 .pr:hover:not(.no-pick):not(.locked){background:var(--surface2)}
-.pr.s-picked{background:var(--blue-bg)}
-.pr.s-correct{background:var(--green-bg)}
-.pr.s-wrong{background:var(--red-bg)}
-.pr.s-wrong .pr-name{text-decoration:line-through;opacity:0.45}
+/* original pick states */
+.pr.s-orig{background:var(--blue-bg)}
+.pr.s-orig-ok{background:var(--green-bg)}
+.pr.s-orig-wrong{background:var(--red-bg)}
+/* backup pick states — always purple, won or lost */
+.pr.s-backup{background:var(--purple-bg)}
+.pr.s-backup-wrong{background:var(--purple-bg)}
+/* eliminated */
 .pr.s-elim{opacity:0.28;cursor:default}
+.pr.s-orig-wrong .pr-name{text-decoration:line-through;opacity:0.5}
+.pr.s-backup-wrong .pr-name{text-decoration:line-through;opacity:0.5}
+
 .pr-seed{font-family:var(--mono);font-size:9px;color:var(--text3);min-width:16px;text-align:center;flex-shrink:0}
-.pr.s-picked .pr-seed{color:var(--blue)}
-.pr.s-correct .pr-seed{color:var(--green)}
 .pr-name{flex:1;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
-.pr.s-picked .pr-name{font-weight:600;color:var(--blue)}
-.pr.s-correct .pr-name{font-weight:600;color:var(--green)}
-.pr.s-wrong .pr-name{color:var(--red)}
-.pr-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.pr-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;background:transparent;border:1px solid var(--border2)}
+
+/* seed/name colors by state */
+.pr.s-orig .pr-seed,.pr.s-orig .pr-name{color:var(--blue)}
+.pr.s-orig .pr-name{font-weight:600}
+.pr.s-orig-ok .pr-seed,.pr.s-orig-ok .pr-name{color:var(--green)}
+.pr.s-orig-ok .pr-name{font-weight:600}
+.pr.s-orig-wrong .pr-name{color:var(--red)}
+.pr.s-backup .pr-seed,.pr.s-backup .pr-name{color:var(--purple)}
+.pr.s-backup .pr-name{font-weight:600}
+.pr.s-backup-wrong .pr-seed,.pr.s-backup-wrong .pr-name{color:var(--purple)}
+.pr.s-backup-wrong .pr-name{font-weight:600}
+
+/* dot colors */
+.pr.s-orig .pr-dot{background:var(--blue);border-color:var(--blue)}
+.pr.s-orig-ok .pr-dot{background:var(--green);border-color:var(--green)}
+.pr.s-orig-wrong .pr-dot{background:var(--red);border-color:var(--red)}
+.pr.s-backup .pr-dot{background:var(--purple);border-color:var(--purple)}
+.pr.s-backup-wrong .pr-dot{background:var(--purple);border-color:var(--purple)}
+
 .pr-edit-btn{display:none;position:absolute;right:18px;top:50%;transform:translateY(-50%);background:var(--surface2);border:1px solid var(--border);color:var(--text3);padding:1px 5px;border-radius:3px;font-size:9px;cursor:pointer;line-height:1.4;z-index:2}
 .pr:hover .pr-edit-btn{display:block}
 .pr-edit-btn:hover{color:var(--accent);border-color:var(--accent)}
-#epm-seed:focus,#epm-name:focus{border-color:var(--accent)!important;outline:none}
-.d-none{background:transparent;border:1px solid var(--border2)}
-.d-pick{background:var(--blue)}.d-ok{background:var(--green)}.d-bad{background:var(--red)}
+
+/* card footer */
 .mc-footer{display:flex;border-top:1px solid var(--border);background:var(--surface2);border-radius:0 0 5px 5px;overflow:hidden}
 .mc-score{flex:1}
 .mc-score input{background:transparent;border:none;outline:none;font-family:var(--mono);font-size:9px;color:var(--text2);width:100%;padding:3px 7px}
 .mc-score input::placeholder{color:var(--text3)}
 .mc-acts{display:flex;border-left:1px solid var(--border)}
-.mc-btn{padding:3px 7px;background:none;border:none;cursor:pointer;font-size:10px;color:var(--text3);border-right:1px solid var(--border);line-height:1;transition:all 0.1s}
+.mc-btn{padding:3px 8px;background:none;border:none;cursor:pointer;font-size:10px;color:var(--text3);border-right:1px solid var(--border);line-height:1;transition:all 0.1s}
 .mc-btn:last-child{border-right:none}
 .mc-btn:hover{background:var(--surface3);color:var(--text)}
 .mc-btn.is-ok{color:var(--green);background:var(--green-bg);font-weight:700}
 .mc-btn.is-bad{color:var(--red);background:var(--red-bg);font-weight:700}
+
+/* champion */
 .champ-box{position:absolute;background:var(--surface);border:1.5px solid var(--accent);border-radius:8px;padding:10px 14px;text-align:center;min-width:130px}
 .champ-label{font-family:var(--mono);font-size:9px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:5px}
 .champ-name{font-family:var(--serif);font-size:13px;color:var(--text)}
@@ -169,11 +184,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:var(--surface2)}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+#epm-seed:focus,#epm-name:focus{border-color:var(--accent)!important;outline:none}
 
-/* ── PRINT: hide everything, print window handles its own rendering ── */
-@media print{
-  body{display:none!important}
-}
+@media print{body{display:none!important}}
 </style>
 </head>
 <body>
@@ -184,12 +197,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
     <div class="wordmark">Slam Bracket</div>
     <h1 class="upload-heading">Upload your<br><em>draw PDF.</em></h1>
     <p class="upload-sub">TNNS Live format. Each draw becomes a tab — upload men's and women's separately and switch between them instantly.</p>
-
     <div class="existing-draws" id="existing-draws" style="display:none">
       <div class="existing-draws-label">Current draws</div>
       <div id="draw-pills"></div>
     </div>
-
     <div class="drop-zone" id="drop-zone">
       <input type="file" accept=".pdf" id="pdf-input">
       <div class="drop-icon">⎘</div>
@@ -236,16 +247,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
     <div class="bracket-title">
       <div><div class="slam-name" id="hdr-slam"></div><div class="draw-name" id="hdr-draw"></div></div>
     </div>
-    <div class="stats-strip">
-      <div class="stat-pill"><span class="slbl">correct</span><span class="sval vg" id="stat-c">0</span></div>
-      <div class="stat-pill"><span class="slbl">wrong</span><span class="sval vr" id="stat-w">0</span></div>
-      <div class="stat-pill"><span class="slbl">accuracy</span><span class="sval" id="stat-p">—</span></div>
-      <div class="stat-pill"><span class="slbl">pending</span><span class="sval" id="stat-o">0</span></div>
+    <div class="stats-strip" id="stats-strip">
+      <!-- populated by renderStats() based on lock state -->
     </div>
     <div class="header-actions">
+      <button class="btn-secondary" id="lock-btn">🔓 Picks open</button>
       <button class="btn-secondary" id="print-btn">⎙ Print</button>
-      <button class="btn-secondary" id="save-btn">Save all</button>
-      <button class="btn-secondary" id="add-draw-btn">+ Add draw</button>
+      <button class="btn-secondary" id="save-btn">Save</button>
+      <button class="btn-secondary" id="add-draw-btn">+ Draw</button>
     </div>
   </div>
   <div class="bracket-body" id="bracket-body"></div>
@@ -255,213 +264,439 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 <div id="edit-player-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:200;align-items:center;justify-content:center">
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:22px;width:340px;max-width:92vw;box-shadow:0 8px 32px rgba(0,0,0,0.15)">
     <div style="font-family:var(--serif);font-size:17px;font-weight:400;margin-bottom:6px" id="epm-title">Edit player</div>
-    <div style="font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.6">Update name and seed — use this for withdrawals and lucky losers. Picks already made for this player will be cleared.</div>
-    <div style="display:flex;gap:8px;margin-bottom:12px">
-      <input id="epm-seed" type="text" maxlength="3" placeholder="Seed / Q / WC / LL" style="width:80px;flex-shrink:0;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:6px;font-family:var(--mono);font-size:12px;outline:none">
+    <div style="font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.6" id="epm-subtitle">Update name and seed. Picks for this player will be cleared.</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px" id="epm-inputs">
+      <input id="epm-seed" type="text" maxlength="3" placeholder="Seed / Q / WC" style="width:80px;flex-shrink:0;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:6px;font-family:var(--mono);font-size:12px;outline:none">
       <input id="epm-name" type="text" placeholder="Player name" style="flex:1;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:6px;font-family:var(--sans);font-size:13px;outline:none">
     </div>
-    <div style="display:flex;gap:8px">
+    <div id="epm-btn-area" style="display:flex;gap:8px">
       <button id="epm-confirm" style="flex:1;padding:9px;background:var(--accent);color:var(--accent-text);border:none;border-radius:7px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer">Update player</button>
       <button id="epm-cancel" style="padding:9px 16px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:7px;font-family:var(--sans);font-size:13px;cursor:pointer">Cancel</button>
     </div>
   </div>
 </div>
 
-
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 const SLAM_CONFIG={AO:{name:'Australian Open',surface:'Hard'},RG:{name:'Roland Garros',surface:'Clay'},WIM:{name:'Wimbledon',surface:'Grass'},USO:{name:'US Open',surface:'Hard'}};
 
 // ── STATE ──
-// state = { draws: [{slam,draw,year,rounds},...], activeTab: 0 }
+// draw = { slam, draw, year, locked, rounds }
+// match = { p1:{name,seed}, p2:{name,seed}, pick, originalPick, winner, result, score }
+//   pick        = current live pick (mutable always pre-lock, backup post-lock)
+//   originalPick = snapshotted at lock time, never changes
+//   result      = 'correct'|'wrong'|null — whether originalPick matched winner
 let state={draws:[],activeTab:0};
-let pdfFile=null;
-let pendingDraw=null; // draw being confirmed before adding
+let pdfFile=null,pendingDraw=null;
 
 function $(id){return document.getElementById(id)}
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active')}
-
 function activeDraw(){return state.draws[state.activeTab]||null}
-
 function applyTheme(slam){document.body.className=slam?'theme-'+slam:''}
+function drawLabel(d){const cfg=SLAM_CONFIG[d.slam]||{};return(cfg.name||d.slam)+' '+d.year+' '+d.draw;}
+function drawShortLabel(d){return d.slam+' '+d.year+' '+d.draw;}
 
-function drawLabel(d){
-  const cfg=SLAM_CONFIG[d.slam]||{};
-  return (cfg.name||d.slam)+' '+d.year+' '+d.draw;
+// ── MATCH HELPERS ──
+// Is this pick a backup? (locked mode, pick differs from originalPick)
+function isBackupPick(m){
+  return !!m.originalPick&&m.pick&&m.pick!==m.originalPick;
+}
+// Is this pick an original pending pick? (pick set, no result yet, not backup)
+function isOrigPick(m){
+  return m.pick&&!m.winner&&!isBackupPick(m);
 }
 
-function drawShortLabel(d){
-  return d.slam+' '+d.year+' '+d.draw;
+// ── SCORING ──
+const ROUND_PTS=[1,2,4,8,16,32,64];
+
+function getSeedVal(name,d){
+  for(const r of d.rounds)for(const m of r.matches){
+    if(m.p1.name===name){const s=parseInt(m.p1.seed);return(s>=1&&s<=32)?s:33;}
+    if(m.p2.name===name){const s=parseInt(m.p2.seed);return(s>=1&&s<=32)?s:33;}
+  }
+  return 33;
 }
 
-// ── STATS for active draw ──
-function updateStats(){
-  const d=activeDraw();
-  if(!d){$('stat-c').textContent='0';$('stat-w').textContent='0';$('stat-p').textContent='—';$('stat-o').textContent='0';return;}
-  let c=0,w=0,o=0;
-  d.rounds.forEach(r=>r.matches.forEach(m=>{
+function calcStats(d){
+  // returns { filled, total, cOrig, wOrig, cBackup, wBackup, pts, bonus }
+  let filled=0,total=0,cOrig=0,wOrig=0,cBackup=0,wBackup=0,pts=0,bonus=0;
+  d.rounds.forEach((r,ri)=>r.matches.forEach(m=>{
     if(!m.p1.name&&!m.p2.name)return;
-    if(m.result==='correct')c++;else if(m.result==='wrong')w++;else if(m.pick)o++;
+    total++;
+    if(m.pick)filled++;
+    if(!m.winner)return;
+    const backup=isBackupPick(m);
+    if(!backup){
+      // original pick outcome
+      if(m.result==='correct'){cOrig++;pts+=ROUND_PTS[ri]||1;bonus+=getSeedVal(m.winner,d);}
+      else if(m.result==='wrong')wOrig++;
+    } else {
+      // backup pick outcome — compare pick to winner
+      if(m.pick===m.winner)cBackup++;
+      else wBackup++;
+    }
   }));
-  $('stat-c').textContent=c;$('stat-w').textContent=w;$('stat-o').textContent=o;
-  const res=c+w;$('stat-p').textContent=res>0?Math.round(c/res*100)+'%':'—';
+  return{filled,total,cOrig,wOrig,cBackup,wBackup,pts,bonus};
+}
+
+function renderStats(){
+  const strip=$('stats-strip');if(!strip)return;
+  const d=activeDraw();
+  strip.innerHTML='';
+  if(!d){return;}
+  const s=calcStats(d);
+  const locked=d.locked;
+
+  function pill(label,val,cls=''){
+    const p=document.createElement('div');p.className='stat-pill';
+    p.innerHTML=`<span class="slbl">${label}</span><span class="sval${cls?' '+cls:''}">${val}</span>`;
+    strip.appendChild(p);
+  }
+  function divider(){
+    const dv=document.createElement('div');dv.className='stat-divider';strip.appendChild(dv);
+  }
+
+  if(!locked){
+    // Unlocked: just show fill progress
+    const pct=s.total>0?Math.round(s.filled/s.total*100):0;
+    pill('picks filled',s.filled+' / '+s.total);
+    pill('','pct filled: '+pct+'%');
+  } else {
+    // Locked: show scoring and accuracy
+    const origRes=s.cOrig+s.wOrig;
+    const allRes=s.cOrig+s.wOrig+s.cBackup+s.wBackup;
+    const allC=s.cOrig+s.cBackup;
+    const bracketAcc=origRes>0?Math.round(s.cOrig/origRes*100)+'%':'—';
+    const matchAcc=allRes>0?Math.round(allC/allRes*100)+'%':'—';
+    pill('pts',s.pts);
+    pill('upset bonus','+'+s.bonus);
+    pill('total',s.pts+s.bonus,'vg');
+    divider();
+    pill('bracket acc',bracketAcc);
+    pill('match acc',matchAcc);
+  }
+}
+
+// ── LOCK / UNLOCK ──
+function lockDraw(){
+  const d=activeDraw();if(!d)return;
+  // Snapshot originalPick for every match
+  d.rounds.forEach(r=>r.matches.forEach(m=>{
+    m.originalPick=m.pick;
+  }));
+  d.locked=true;
+  saveToStorage();updateLockBtn();renderStats();renderBracket();
+}
+
+function doUnlock(){
+  const d=activeDraw();if(!d)return;
+  const hasResults=d.rounds.some(r=>r.matches.some(m=>m.winner));
+  if(hasResults){
+    d.rounds.forEach(r=>r.matches.forEach(m=>{
+      m.winner=null;m.result=null;m.score='';
+      m.pick=m.originalPick||m.pick;
+      m.originalPick=null;
+    }));
+    d.rounds.forEach((r,ri)=>r.matches.forEach((m,mi)=>placePickInNextRound(d,ri,mi)));
+  } else {
+    d.rounds.forEach(r=>r.matches.forEach(m=>{m.originalPick=null;}));
+  }
+  d.locked=false;
+  saveToStorage();updateLockBtn();renderStats();renderBracket();
+}
+
+function unlockDraw(){
+  const d=activeDraw();if(!d)return;
+  const hasResults=d.rounds.some(r=>r.matches.some(m=>m.winner));
+  if(!hasResults){doUnlock();return;}
+  // Show inline confirmation
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:500;display:flex;align-items:center;justify-content:center';
+  const box=document.createElement('div');
+  box.style.cssText='background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:24px;width:340px;max-width:92vw;box-shadow:0 8px 32px rgba(0,0,0,0.18)';
+  box.innerHTML=`
+    <div style="font-family:var(--serif);font-size:17px;margin-bottom:8px">Unlock bracket?</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:18px">This will clear all confirmed results and backup picks. Your original picks will be preserved.</div>
+    <div style="display:flex;gap:8px">
+      <button id="unlock-confirm" style="flex:1;padding:9px;background:var(--red);color:#fff;border:none;border-radius:7px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer">Yes, unlock</button>
+      <button id="unlock-cancel" style="padding:9px 16px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:7px;font-family:var(--sans);font-size:13px;cursor:pointer">Cancel</button>
+    </div>`;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  document.getElementById('unlock-confirm').addEventListener('click',()=>{document.body.removeChild(overlay);doUnlock();});
+  document.getElementById('unlock-cancel').addEventListener('click',()=>document.body.removeChild(overlay));
+}
+
+function updateLockBtn(){
+  const btn=$('lock-btn');if(!btn)return;
+  const locked=activeDraw()&&activeDraw().locked;
+  btn.textContent=locked?'🔒 Locked':'🔓 Picks open';
+  btn.className='btn-secondary'+(locked?' btn-lock-on':'');
+}
+
+$('lock-btn').addEventListener('click',()=>{
+  const d=activeDraw();if(!d)return;
+  if(d.locked)unlockDraw();else lockDraw();
+});
+
+// ── PICK CASCADE (pre-lock only) ──
+function findSeed(d,name){
+  for(const r of d.rounds)for(const m of r.matches){
+    if(m.p1.name===name&&m.p1.seed)return m.p1.seed;
+    if(m.p2.name===name&&m.p2.seed)return m.p2.seed;
+  }
+  return'';
+}
+
+function getNextSlot(d,ri,mi){
+  const nri=ri+1;
+  if(nri>=d.rounds.length)return null;
+  return{nri,nmi:Math.floor(mi/2),side:mi%2===0?'p1':'p2'};
+}
+
+function placePickInNextRound(d,ri,mi){
+  const m=d.rounds[ri].matches[mi];
+  const next=getNextSlot(d,ri,mi);
+  if(next){
+    const nm=d.rounds[next.nri].matches[next.nmi];
+    if(!nm.winner){
+      nm[next.side]=m.pick?{name:m.pick,seed:findSeed(d,m.pick)}:{name:'',seed:''};
+    }
+  }
+}
+
+function cascadePicksFrom(d,ri,mi){
+  // Walk forward from this match, placing picks into subsequent rounds
+  let r=ri,m=mi;
+  while(true){
+    placePickInNextRound(d,r,m);
+    const next=getNextSlot(d,r,m);
+    if(!next)break;
+    const nm=d.rounds[next.nri].matches[next.nmi];
+    // Stop if next match already has a winner or the slot we'd fill isn't our pick
+    if(nm.winner)break;
+    r=next.nri;m=next.nmi;
+    // Only continue if the pick in the next match is ours (avoid overwriting unrelated picks)
+    const side=getNextSlot(d,r-1<0?0:r-1,Math.floor(m/2))?.side; // just stop here
+    break; // placePickInNextRound handles one step; cascade is called per-match on set
+  }
+}
+
+function handlePickClick(ri,mi,p){
+  const d=activeDraw();if(!d)return;
+  const m=d.rounds[ri].matches[mi];
+  // Pre-lock: can't pick in a match that already has a confirmed winner
+  if(!d.locked&&m.winner)return;
+  // Post-lock: can only pick in matches that have both players known (result not final)
+  if(d.locked&&m.winner)return;
+  // Post-lock: can't change an original pick match that's been resolved
+  if(d.locked&&m.result&&!isBackupPick(m))return;
+
+  if(d.locked){
+    // Backup pick — just set m.pick, no cascade
+    m.pick=m.pick===p.name?null:p.name;
+  } else {
+    // Original pick — set and cascade
+    const prev=m.pick;
+    m.pick=m.pick===p.name?null:p.name;
+    // Cascade: clear the old pick from next round if it was propagated there
+    if(prev&&prev!==m.pick){
+      clearPickForward(d,ri,mi,prev);
+    }
+    // Place new pick forward
+    placePickAllRounds(d,ri,mi);
+  }
+  saveToStorage();renderStats();renderBracket();
+}
+
+function placePickAllRounds(d,ri,mi){
+  // Cascade pick forward through all rounds until we hit a confirmed winner
+  let r=ri,m=mi;
+  while(true){
+    placePickInNextRound(d,r,m);
+    const next=getNextSlot(d,r,m);
+    if(!next)break;
+    const nm=d.rounds[next.nri].matches[next.nmi];
+    if(nm.winner)break;
+    // Only continue if the slot we just wrote is the pick in the next match
+    // (don't overwrite independently-made picks in downstream matches)
+    const side=mi%2===0?'p1':'p2'; // side of current match in next match — recalc
+    r=next.nri;m=next.nmi;
+    // Stop if next match has its own independent pick already
+    // (i.e. our cascaded name is not picked there)
+    if(nm.pick&&nm.pick!==d.rounds[r].matches[m][m%2===0?'p1':'p2']?.name)break;
+  }
+}
+
+function clearPickForward(d,ri,mi,name){
+  // Walk forward and null out slots/picks that matched the old name
+  let r=ri,m=mi;
+  while(true){
+    const next=getNextSlot(d,r,m);if(!next)break;
+    const nm=d.rounds[next.nri].matches[next.nmi];
+    if(nm.winner)break;
+    const side=next.side;
+    if(nm[side].name===name){nm[side]={name:'',seed:''};}
+    if(nm.pick===name){nm.pick=null;}
+    r=next.nri;m=next.nmi;
+    if(!nm.pick&&!nm[side]?.name)break;// nothing more to clear
+  }
+}
+
+// ── APPLY WINNER (post-lock) ──
+function applyWinner(d,ri,mi,winnerName){
+  const m=d.rounds[ri].matches[mi];
+  m.winner=winnerName;
+  // Result is always judged against originalPick
+  m.result=m.originalPick?(m.originalPick===winnerName?'correct':'wrong'):null;
+  // Place winner in next slot (this becomes a "known player" for backup picking)
+  const next=getNextSlot(d,ri,mi);
+  if(next){
+    const nm=d.rounds[next.nri].matches[next.nmi];
+    if(!nm.winner){
+      nm[next.side]={name:winnerName,seed:findSeed(d,winnerName)};
+    }
+  }
+  // Update champion box
+  const fin=d.rounds[d.rounds.length-1].matches[0];
+  const cn=document.querySelector('.champ-name');
+  if(cn)cn.textContent=fin&&fin.winner?fin.winner:(fin&&fin.pick)||'—';
+  saveToStorage();renderStats();renderBracket();
+}
+
+function undoWinner(d,ri,mi){
+  const m=d.rounds[ri].matches[mi];
+  const wasWinner=m.winner;
+  m.winner=null;m.result=null;
+  // Remove winner from next slot if it's still there
+  const next=getNextSlot(d,ri,mi);
+  if(next&&wasWinner){
+    const nm=d.rounds[next.nri].matches[next.nmi];
+    if(!nm.winner&&nm[next.side].name===wasWinner){
+      nm[next.side]={name:'',seed:''};
+    }
+  }
+  saveToStorage();renderStats();renderBracket();
+}
+
+// ── WINNER PICKER (when no pick set and ✓/✗ clicked) ──
+function openWinnerPicker(d,ri,mi,cb){
+  const m=d.rounds[ri].matches[mi];
+  const players=[m.p1,m.p2].filter(p=>p.name);
+  if(players.length===0){alert('No players in this match.');return;}
+  if(players.length===1){cb(players[0].name);return;}
+  const modal=$('edit-player-modal');
+  $('epm-title').textContent='Who won this match?';
+  $('epm-subtitle').textContent='';
+  $('epm-inputs').style.display='none';
+  const area=$('epm-btn-area');area.innerHTML='';
+  const col=document.createElement('div');col.style.cssText='display:flex;flex-direction:column;gap:8px;width:100%';
+  players.forEach(p=>{
+    const btn=document.createElement('button');
+    btn.style.cssText='padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:7px;font-family:var(--sans);font-size:13px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px';
+    btn.innerHTML=`<span style="font-family:var(--mono);font-size:10px;color:var(--accent);min-width:20px">${p.seed||''}</span>${p.name}`;
+    btn.addEventListener('click',()=>{closeModal();cb(p.name);});
+    col.appendChild(btn);
+  });
+  const cancel=document.createElement('button');
+  cancel.style.cssText='padding:8px;background:none;border:1px solid var(--border2);color:var(--text2);border-radius:7px;font-size:12px;cursor:pointer';
+  cancel.textContent='Cancel';cancel.addEventListener('click',closeModal);
+  col.appendChild(cancel);
+  area.appendChild(col);
+  modal.style.display='flex';
+}
+
+function closeModal(){
+  const modal=$('edit-player-modal');
+  modal.style.display='none';
+  $('epm-inputs').style.display='';
+  $('epm-subtitle').textContent='Update name and seed. Picks for this player will be cleared.';
+  $('epm-btn-area').innerHTML=`<button id="epm-confirm" style="flex:1;padding:9px;background:var(--accent);color:var(--accent-text);border:none;border-radius:7px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer">Update player</button><button id="epm-cancel" style="padding:9px 16px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:7px;font-family:var(--sans);font-size:13px;cursor:pointer">Cancel</button>`;
+  $('epm-cancel').addEventListener('click',closeModal);
+  $('epm-confirm').addEventListener('click',confirmEditPlayer);
 }
 
 // ── EDIT PLAYER MODAL ──
-let editCtx=null; // {ri, mi, side}
+let editCtx=null;
 
 function openEditPlayerModal(ri,mi,side){
   const d=activeDraw();if(!d)return;
   const m=d.rounds[ri].matches[mi];
-  const p=m[side];
   editCtx={ri,mi,side};
-  document.getElementById('epm-title').textContent='Edit player — '+( p.name||'empty slot');
-  document.getElementById('epm-seed').value=p.seed||'';
-  document.getElementById('epm-name').value=p.name||'';
-  const modal=document.getElementById('edit-player-modal');
-  modal.style.display='flex';
-  setTimeout(()=>document.getElementById('epm-name').focus(),50);
+  $('epm-title').textContent='Edit player — '+(m[side].name||'empty slot');
+  $('epm-seed').value=m[side].seed||'';
+  $('epm-name').value=m[side].name||'';
+  $('edit-player-modal').style.display='flex';
+  setTimeout(()=>$('epm-name').focus(),50);
 }
 
-document.getElementById('epm-cancel').addEventListener('click',()=>{
-  document.getElementById('edit-player-modal').style.display='none';editCtx=null;
-});
-document.getElementById('edit-player-modal').addEventListener('click',e=>{
-  if(e.target===document.getElementById('edit-player-modal')){document.getElementById('edit-player-modal').style.display='none';editCtx=null;}
-});
-document.getElementById('epm-confirm').addEventListener('click',()=>{
+function confirmEditPlayer(){
   if(!editCtx)return;
   const d=activeDraw();if(!d)return;
-  const {ri,mi,side}=editCtx;
+  const{ri,mi,side}=editCtx;
   const m=d.rounds[ri].matches[mi];
   const oldName=m[side].name;
-  const newName=document.getElementById('epm-name').value.trim();
-  const newSeed=document.getElementById('epm-seed').value.trim();
-
-  // Update the player slot
+  const newName=$('epm-name').value.trim();
+  const newSeed=$('epm-seed').value.trim();
   m[side]={name:newName,seed:newSeed};
-
-  // If this player was picked in this match, clear the pick
-  if(m.pick===oldName){m.pick=null;}
-
-  // If this player appeared as a pick or slot in future rounds (from pre-tournament picks),
-  // replace oldName with newName forward, or clear if name is now blank
-  if(oldName&&oldName!==newName){
-    updatePlayerNameForward(ri,mi,oldName,newName,newSeed);
-  }
-
-  document.getElementById('edit-player-modal').style.display='none';
-  editCtx=null;
-  saveToStorage();updateStats();renderBracket();
-});
-
-function openWinnerPicker(ri,mi,mode){
-  // mode: 'correct' = picked player won, 'wrong' = other player won
-  // When no pick is set, let user choose who won directly
-  const d=activeDraw();if(!d)return;
-  const m=d.rounds[ri].matches[mi];
-  const players=[m.p1,m.p2].filter(p=>p.name);
-  if(players.length===0){alert('No players in this match yet.');return;}
-  if(players.length===1){
-    // Only one player — they must be the winner
-    applyWinner(ri,mi,players[0].name);return;
-  }
-  // Show a simple inline picker using the edit modal
-  const modal=document.getElementById('edit-player-modal');
-  const title=document.getElementById('epm-title');
-  const seedInp=document.getElementById('epm-seed');
-  const nameInp=document.getElementById('epm-name');
-  title.textContent='Who won this match?';
-  seedInp.style.display='none';
-  nameInp.style.display='none';
-  // Replace confirm button row with two player buttons
-  const confirmBtn=document.getElementById('epm-confirm');
-  const cancelBtn=document.getElementById('epm-cancel');
-  const origConfirmText=confirmBtn.textContent;
-  confirmBtn.parentElement.innerHTML='';
-  const btnRow=document.createElement('div');btnRow.style.cssText='display:flex;gap:8px;flex-direction:column';
-  players.forEach(p=>{
-    const btn=document.createElement('button');
-    btn.style.cssText='padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:7px;font-family:var(--sans);font-size:13px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px';
-    btn.innerHTML='<span style="font-family:var(--mono);font-size:10px;color:var(--accent);min-width:20px">'+p.seed+'</span>'+p.name;
-    btn.addEventListener('click',()=>{
-      modal.style.display='none';
-      seedInp.style.display='';nameInp.style.display='';
-      // Restore buttons
-      const row=btnRow.parentElement;
-      row.innerHTML='<button id="epm-confirm" style="flex:1;padding:9px;background:var(--accent);color:var(--accent-text);border:none;border-radius:7px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer">Update player</button><button id="epm-cancel" style="padding:9px 16px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:7px;font-family:var(--sans);font-size:13px;cursor:pointer">Cancel</button>';
-      document.getElementById('epm-cancel').addEventListener('click',()=>{document.getElementById('edit-player-modal').style.display='none';editCtx=null;});
-      document.getElementById('epm-confirm').addEventListener('click',()=>{
-        if(!editCtx)return;
-        const d=activeDraw();if(!d)return;
-        const {ri,mi,side}=editCtx;
-        const m=d.rounds[ri].matches[mi];
-        const oldName=m[side].name;
-        const newName=document.getElementById('epm-name').value.trim();
-        const newSeed=document.getElementById('epm-seed').value.trim();
-        m[side]={name:newName,seed:newSeed};
-        if(m.pick===oldName){m.pick=null;}
-        if(oldName&&oldName!==newName){updatePlayerNameForward(ri,mi,oldName,newName,newSeed);}
-        document.getElementById('edit-player-modal').style.display='none';editCtx=null;
-        saveToStorage();updateStats();renderBracket();
-      });
-      applyWinner(ri,mi,p.name);
-    });
-    btnRow.appendChild(btn);
-  });
-  const cancelBtn2=document.createElement('button');
-  cancelBtn2.style.cssText='padding:8px;background:var(--surface2);border:1px solid var(--border2);color:var(--text2);border-radius:7px;font-family:var(--sans);font-size:12px;cursor:pointer';
-  cancelBtn2.textContent='Cancel';
-  cancelBtn2.addEventListener('click',()=>{
-    modal.style.display='none';
-    seedInp.style.display='';nameInp.style.display='';
-  });
-  btnRow.appendChild(cancelBtn2);
-  // Find the button row div and replace
-  const existingRow=document.querySelector('#edit-player-modal > div > div:last-child');
-  if(existingRow){existingRow.innerHTML='';existingRow.appendChild(btnRow);}
-  modal.style.display='flex';
+  if(m.pick===oldName)m.pick=null;
+  if(oldName&&oldName!==newName)updatePlayerNameForward(d,ri,mi,oldName,newName,newSeed);
+  closeModal();editCtx=null;
+  saveToStorage();renderStats();renderBracket();
 }
 
-function updatePlayerNameForward(startRi,startMi,oldName,newName,newSeed){
-  // Walk forward through rounds and update slots/picks that reference oldName
-  // Only touch slots that were populated by picks (not confirmed winners)
-  const d=activeDraw();if(!d)return;
-  let ri=startRi,mi=startMi;
+function updatePlayerNameForward(d,ri,mi,oldName,newName,newSeed){
+  let r=ri,m=mi;
   while(true){
-    const nri=ri+1;if(nri>=d.rounds.length)break;
-    const nmi=Math.floor(mi/2);
-    const side=mi%2===0?'p1':'p2';
+    const nri=r+1;if(nri>=d.rounds.length)break;
+    const nmi=Math.floor(m/2);
+    const side=m%2===0?'p1':'p2';
     const nm=d.rounds[nri].matches[nmi];
-    // Only update predicted slots (not confirmed winners from a different source)
-    if(nm[side].name===oldName&&nm.winner!==oldName){
-      nm[side]={name:newName||'',seed:newSeed||''};
-    }
-    // Update pick reference
-    if(nm.pick===oldName){nm.pick=newName||null;}
-    // Stop if this match has a confirmed winner (results are locked in)
+    if(nm[side].name===oldName&&!nm.winner)nm[side]={name:newName||'',seed:newSeed||''};
+    if(nm.pick===oldName)nm.pick=newName||null;
     if(nm.winner)break;
-    ri=nri;mi=nmi;
+    r=nri;m=nmi;
   }
 }
 
-function saveToStorage(){localStorage.setItem('slam_bracket',JSON.stringify(state))}
+$('epm-cancel').addEventListener('click',closeModal);
+$('epm-confirm').addEventListener('click',confirmEditPlayer);
+$('edit-player-modal').addEventListener('click',e=>{if(e.target===$('edit-player-modal'))closeModal();});
+
+// ── STORAGE ──
+function saveToStorage(){localStorage.setItem('slam_bracket',JSON.stringify(state));}
 function triggerDownload(){
-  const b=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(b);
-  // Name after the event (slam+year) — one file covers all draws for that event
   const ad=activeDraw();
   const slug=ad?(ad.slam+'-'+ad.year).replace(/[^a-zA-Z0-9]+/g,'-'):'slam-bracket';
-  a.download='slam-bracket-'+slug+'.json';a.click();
+  const b=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='slam-bracket-'+slug+'.json';a.click();
 }
 
-// ── PDF + PARSER ──
+function migrateState(s){
+  // Migrate old match fields to new model
+  const draws=s.draws||[];
+  draws.forEach(d=>{
+    if(d.locked===undefined)d.locked=false;
+    if(d.rounds)d.rounds.forEach(r=>r.matches.forEach(m=>{
+      if(m.backup!==undefined)delete m.backup;
+      if(m.backupSide!==undefined)delete m.backupSide;
+      if(m.p1Backup!==undefined)delete m.p1Backup;
+      if(m.p2Backup!==undefined)delete m.p2Backup;
+      if(m.watch!==undefined)delete m.watch;
+      if(m.originalPick===undefined)m.originalPick=null;
+    }));
+  });
+  return s;
+}
+
+// ── PDF PARSER ──
 async function extractPdfText(file){
   const ab=await file.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:ab}).promise;
   let text='';
   for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i);const c=await pg.getTextContent();text+=c.items.map(it=>it.str).join(' ')+'\n';}
   return text;
 }
+
 function parseTnnsText(text){
   const byPos={};
   for(const line of text.split('\n')){
@@ -487,86 +722,21 @@ function parseTnnsText(text){
   return matches;
 }
 
-// ── BUILD ROUNDS ──
-function buildInitialState(r1m){
-  const r1=r1m.map((m,i)=>({id:'r1_'+i,p1:{name:m.p1_name||'',seed:m.p1_seed||''},p2:{name:m.p2_name||'',seed:m.p2_seed||''},pick:null,winner:null,result:null,score:'',watch:false}));
+function buildInitialRounds(r1m){
+  const r1=r1m.map((m,i)=>({
+    id:'r1_'+i,
+    p1:{name:m.p1_name||'',seed:m.p1_seed||''},
+    p2:{name:m.p2_name||'',seed:m.p2_seed||''},
+    pick:null,originalPick:null,winner:null,result:null,score:''
+  }));
   const rounds=[{label:'R1',matches:r1}];let prev=r1;
   ['R2','R3','R4','QF','SF','F'].forEach(lbl=>{
     const cnt=Math.ceil(prev.length/2);if(cnt<1)return;
-    const ms=[];for(let i=0;i<cnt;i++)ms.push({id:lbl+'_'+i,p1:{name:'',seed:''},p2:{name:'',seed:''},pick:null,winner:null,result:null,score:'',watch:false});
+    const ms=[];
+    for(let i=0;i<cnt;i++)ms.push({id:lbl+'_'+i,p1:{name:'',seed:''},p2:{name:'',seed:''},pick:null,originalPick:null,winner:null,result:null,score:''});
     rounds.push({label:lbl,matches:ms});prev=ms;
   });
   return rounds;
-}
-
-// ── BRACKET LOGIC (operates on active draw) ──
-function findSeed(name){
-  const d=activeDraw();if(!d)return'';
-  for(const r of d.rounds)for(const m of r.matches){if(m.p1.name===name&&m.p1.seed)return m.p1.seed;if(m.p2.name===name&&m.p2.seed)return m.p2.seed;}
-  return'';
-}
-function getNextSlot(ri,mi){const nri=ri+1;const d=activeDraw();if(!d||nri>=d.rounds.length)return null;return{nri,nmi:Math.floor(mi/2),side:mi%2===0?'p1':'p2'};}
-
-function placePickInNextRound(ri,mi){
-  const d=activeDraw();if(!d)return;
-  const m=d.rounds[ri].matches[mi];const next=getNextSlot(ri,mi);
-  if(next){
-    const nm=d.rounds[next.nri].matches[next.nmi];
-    if(!nm.winner){nm[next.side]=m.pick?{name:m.pick,seed:findSeed(m.pick)}:{name:'',seed:''};}
-  }
-  // If this is the Final (no next slot), cascade pick to champion box
-  if(!next){
-    const cn=document.querySelector('.champ-name');
-    if(cn)cn.textContent=m.pick||'—';
-  }
-}
-
-function applyWinner(ri,mi,winnerName){
-  const d=activeDraw();if(!d)return;
-  const m=d.rounds[ri].matches[mi];
-  const loserName=m.p1.name===winnerName?m.p2.name:m.p1.name;
-  m.winner=winnerName;m.result=m.pick?(m.pick===winnerName?'correct':'wrong'):null;
-  const next=getNextSlot(ri,mi);
-  if(next){
-    const nm=d.rounds[next.nri].matches[next.nmi];
-    nm[next.side]={name:winnerName,seed:findSeed(winnerName)};
-    if(nm.pick&&nm.pick===loserName){nm.result='wrong';propagateLoserElimination(loserName,next.nri,next.nmi);}
-  }
-  saveToStorage();updateStats();renderBracket();
-  // Explicitly update champion box after final result
-  const d2=activeDraw();
-  if(d2&&d2.rounds){
-    const fin=d2.rounds[d2.rounds.length-1];
-    if(fin&&fin.matches[0]&&fin.matches[0].winner){
-      const cn=document.querySelector('.champ-name');
-      if(cn)cn.textContent=fin.matches[0].winner;
-    }
-  }
-}
-
-function propagateLoserElimination(loserName,startRi,startMi){
-  const d=activeDraw();if(!d)return;
-  let ri=startRi,mi=startMi;
-  while(true){
-    const m=d.rounds[ri]&&d.rounds[ri].matches[mi];if(!m)break;
-    if(m.pick===loserName&&m.result===null)m.result='wrong';
-    let ls=null;
-    if(m.p1.name===loserName&&m.winner!==loserName)ls='p1';
-    else if(m.p2.name===loserName&&m.winner!==loserName)ls='p2';
-    if(ls)m[ls]={name:'',seed:''};
-    const next=getNextSlot(ri,mi);if(!next)break;
-    if(!ls&&m.pick!==loserName)break;
-    ri=next.nri;mi=next.nmi;
-  }
-}
-
-function handlePickClick(ri,mi,p){
-  const d=activeDraw();if(!d)return;
-  const m=d.rounds[ri].matches[mi];
-  if(m.result==='correct'||m.winner)return;
-  if(m.pick===p.name){m.pick=null;placePickInNextRound(ri,mi);}
-  else{if(m.pick){m.pick=null;placePickInNextRound(ri,mi);}m.pick=p.name;placePickInNextRound(ri,mi);}
-  saveToStorage();updateStats();renderBracket();
 }
 
 // ── TABS ──
@@ -577,13 +747,12 @@ function renderTabs(){
     tab.className='tab'+(i===state.activeTab?' active':'');
     const dot=document.createElement('span');dot.className='tab-dot';
     const lbl=document.createElement('span');lbl.textContent=drawShortLabel(d);
-    const cls=document.createElement('button');cls.className='tab-close';cls.textContent='×';cls.title='Remove this draw';
+    const cls=document.createElement('button');cls.className='tab-close';cls.textContent='×';cls.title='Remove draw';
     cls.addEventListener('click',e=>{e.stopPropagation();removeDrawTab(i);});
     tab.appendChild(dot);tab.appendChild(lbl);tab.appendChild(cls);
     tab.addEventListener('click',()=>switchTab(i));
     bar.appendChild(tab);
   });
-  // + button
   const addBtn=document.createElement('button');
   addBtn.className='tab-add';addBtn.textContent='+';addBtn.title='Add another draw';
   addBtn.addEventListener('click',()=>{saveToStorage();showUploadScreen();});
@@ -597,7 +766,7 @@ function switchTab(i){
   const cfg=SLAM_CONFIG[d.slam]||{};
   $('hdr-slam').textContent=(cfg.name||d.slam)+' '+d.year;
   $('hdr-draw').textContent=d.draw+(cfg.surface?' · '+cfg.surface:'');
-  renderTabs();updateStats();renderBracket();
+  renderTabs();updateLockBtn();renderStats();renderBracket();
 }
 
 function removeDrawTab(i){
@@ -638,13 +807,19 @@ function renderBracket(){
 
   const wrap=document.createElement('div');
   wrap.className='bracket-svg-wrap';
-  wrap.style.width=totalW+'px';wrap.style.height=totalH+'px';wrap.style.position='relative';
+  wrap.style.cssText=`width:${totalW}px;height:${totalH}px;position:relative`;
 
   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
   svg.setAttribute('width',totalW);svg.setAttribute('height',totalH);
   svg.style.cssText='position:absolute;top:0;left:0;pointer-events:none;overflow:visible';
 
   const connColor='#c8c4bb';
+
+  function addLine(x1,y1,x2,y2){
+    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1',x1);l.setAttribute('y1',y1);l.setAttribute('x2',x2);l.setAttribute('y2',y2);
+    l.setAttribute('stroke',connColor);l.setAttribute('stroke-width','1');svg.appendChild(l);
+  }
 
   function drawSep(y,dashed){
     const lw=drawRounds*COL-GAP;
@@ -655,27 +830,26 @@ function renderBracket(){
     svg.appendChild(line);
   }
   function sepY(idx){return(r1YCenter(idx-1)+CH/2+r1YCenter(idx)-CH/2)/2;}
-
   drawSep(sepY(q),true);drawSep(sepY(half),false);drawSep(sepY(half+q),true);
 
   const sectionDefs=[{label:'Top Half · Q1',mi:0},{label:'Top Half · Q2',mi:q},{label:'Bottom Half · Q3',mi:half},{label:'Bottom Half · Q4',mi:half+q}];
   sectionDefs.forEach(s=>{
     const lbl=document.createElement('div');
-    lbl.style.cssText='position:absolute;left:0;font-family:var(--mono);font-size:8px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);white-space:nowrap;line-height:1';
-    lbl.style.top=(r1YCenter(s.mi)-CH/2-13)+'px';lbl.textContent=s.label;wrap.appendChild(lbl);
+    lbl.style.cssText=`position:absolute;left:0;font-family:var(--mono);font-size:8px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);white-space:nowrap;top:${r1YCenter(s.mi)-CH/2-13}px`;
+    lbl.textContent=s.label;wrap.appendChild(lbl);
   });
 
   for(let ri=0;ri<drawRounds;ri++){
     const x=ri*COL;
     rounds[ri].matches.forEach((m,mi)=>{
       const cy=matchYCenter(ri,mi),y=cy-CH/2;
-      placeCard(m,ri,mi,x,y,wrap,rounds);
+      placeCard(d,m,ri,mi,x,y,wrap);
       if(ri<drawRounds-1){
         const rx=x+CW,midX=rx+GAP/2;
         const pcy=matchYCenter(ri+1,Math.floor(mi/2));
-        addLine(svg,rx,cy,midX,cy,connColor);
-        if(mi%2===0){addLine(svg,midX,cy,midX,matchYCenter(ri,mi+1),connColor);}
-        addLine(svg,midX,pcy,(ri+1)*COL,pcy,connColor);
+        addLine(rx,cy,midX,cy);
+        if(mi%2===0){addLine(midX,cy,midX,matchYCenter(ri,mi+1));}
+        addLine(midX,pcy,(ri+1)*COL,pcy);
       }
     });
   }
@@ -683,26 +857,27 @@ function renderBracket(){
   const finX=drawRounds*COL,finCY=totalH/2,finY=finCY-CH/2;
   const finMatch=rounds[rounds.length-1].matches[0];
   if(finMatch){
-    placeCard(finMatch,rounds.length-1,0,finX,finY,wrap,rounds);
+    placeCard(d,finMatch,rounds.length-1,0,finX,finY,wrap);
     const sfRi=drawRounds-1;
     if(rounds[sfRi]&&rounds[sfRi].matches.length>=2){
       const sfX=(drawRounds-1)*COL,midX=sfX+CW+GAP/2;
       const sf0=matchYCenter(sfRi,0),sf1=matchYCenter(sfRi,1);
-      addLine(svg,sfX+CW,sf0,midX,sf0,connColor);addLine(svg,sfX+CW,sf1,midX,sf1,connColor);
-      addLine(svg,midX,sf0,midX,sf1,connColor);addLine(svg,midX,finCY,finX,finCY,connColor);
+      addLine(sfX+CW,sf0,midX,sf0);addLine(sfX+CW,sf1,midX,sf1);
+      addLine(midX,sf0,midX,sf1);addLine(midX,finCY,finX,finCY);
     }
   }
 
+  // Champion box
   const champX=finX+CW+GAP,champY=finCY-36;
   const champDiv=document.createElement('div');champDiv.className='champ-box';
-  champDiv.style.left=champX+'px';champDiv.style.top=champY+'px';
+  champDiv.style.cssText=`left:${champX}px;top:${champY}px;position:absolute`;
   const champLbl=document.createElement('div');champLbl.className='champ-label';champLbl.textContent='Champion';
   const champNm=document.createElement('div');champNm.className='champ-name';
-  const finPick=finMatch&&(finMatch.winner||finMatch.pick)||'';
-  champNm.textContent=finPick||'—';
+  champNm.textContent=(finMatch&&(finMatch.winner||finMatch.pick))||'—';
   champDiv.appendChild(champLbl);champDiv.appendChild(champNm);wrap.appendChild(champDiv);
-  addLine(svg,finX+CW,finCY,champX,finCY,connColor);
+  addLine(finX+CW,finCY,champX,finCY);
 
+  // Round labels
   const lblRow=document.createElement('div');
   lblRow.style.cssText='display:flex;align-items:center;padding-bottom:10px;min-width:max-content';
   for(let ri=0;ri<drawRounds;ri++){
@@ -719,69 +894,66 @@ function renderBracket(){
   outer.appendChild(lblRow);wrap.appendChild(svg);outer.appendChild(wrap);body.appendChild(outer);
 }
 
-function addLine(svg,x1,y1,x2,y2,color){
-  const l=document.createElementNS('http://www.w3.org/2000/svg','line');
-  l.setAttribute('x1',x1);l.setAttribute('y1',y1);l.setAttribute('x2',x2);l.setAttribute('y2',y2);
-  l.setAttribute('stroke',color);l.setAttribute('stroke-width','1');svg.appendChild(l);
-}
+function placeCard(d,m,ri,mi,x,y,wrap){
+  // Card border reflects only original pick result
+  let cardCls='mc';
+  if(m.result==='correct')cardCls+=' st-correct';
+  else if(m.result==='wrong')cardCls+=' st-wrong';
 
-function placeCard(m,ri,mi,x,y,wrap,rounds){
   const card=document.createElement('div');
-  card.className='mc'+(m.result?' st-'+m.result:'')+(m.watch?' watched':'');
-  card.style.left=x+'px';card.style.top=y+'px';
+  card.className=cardCls;
+  card.style.cssText=`left:${x}px;top:${y}px`;
 
   function makeRow(p,side){
-    const isPicked=m.pick&&m.pick===p.name;
-    const isCorrect=isPicked&&m.result==='correct';
-    const isWrong=isPicked&&m.result==='wrong';
-    const isElim=m.winner&&m.winner!==p.name&&p.name&&!isPicked;
-    let cls='pr';
-    if(!p.name)cls+=' no-pick';
-    else if(isCorrect)cls+=' s-correct locked';
-    else if(isWrong)cls+=' s-wrong locked';
-    else if(isPicked)cls+=' s-picked';
-    else if(isElim)cls+=' s-elim';
-    const dotCls=isCorrect?'d-ok':isWrong?'d-bad':isPicked?'d-pick':'d-none';
-    const row=document.createElement('div');row.className=cls;
-    row.style.position='relative';
+    const isOrigPick=m.originalPick&&m.originalPick===p.name;
+    const isLivePick=m.pick&&m.pick===p.name;
+    const isBackup=isLivePick&&isBackupPick(m);
+    const backupWrong=isBackup&&m.winner&&m.winner!==p.name;
+    const isElim=m.winner&&m.winner!==p.name&&p.name&&!isLivePick;
 
-    // Build row contents with createElement (not innerHTML) so appended children survive
+    let cls='pr';
+    if(!p.name){
+      cls+=' no-pick';
+    } else if(isOrigPick&&m.result==='correct'){
+      cls+=' s-orig-ok locked';
+    } else if(isOrigPick&&m.result==='wrong'){
+      cls+=' s-orig-wrong locked';
+    } else if(isBackup&&backupWrong){
+      cls+=' s-backup-wrong locked';
+    } else if(isBackup){
+      cls+=' s-backup';
+    } else if(isOrigPick||isLivePick){
+      cls+=' s-orig'; // pending original pick (pre or post lock, no result yet)
+    } else if(isElim){
+      cls+=' s-elim';
+    }
+
+    const row=document.createElement('div');row.className=cls;row.style.position='relative';
     const seedEl=document.createElement('span');seedEl.className='pr-seed';seedEl.textContent=p.seed||'';
     const nameEl=document.createElement('span');nameEl.className='pr-name';nameEl.textContent=p.name||'—';
-    const dotEl=document.createElement('div');dotEl.className='pr-dot '+dotCls;
+    const dotEl=document.createElement('div');dotEl.className='pr-dot';
     row.appendChild(seedEl);row.appendChild(nameEl);row.appendChild(dotEl);
 
-    // Edit button — R1 only
-    if(ri===0){
+    if(ri===0&&!d.locked){
       const editBtn=document.createElement('button');
       editBtn.className='pr-edit-btn';editBtn.textContent='✎';editBtn.title='Edit player';
       editBtn.addEventListener('click',e=>{e.stopPropagation();openEditPlayerModal(ri,mi,side);});
       row.appendChild(editBtn);
     }
 
-    if(p.name&&!isElim&&!m.winner&&m.result!=='correct'){row.addEventListener('click',()=>handlePickClick(ri,mi,p));}
+    // Clickable: no winner yet, not a locked-and-resolved original pick
+    const isResolved=cls.includes('locked');
+    if(p.name&&!m.winner&&!isResolved){
+      row.addEventListener('click',()=>handlePickClick(ri,mi,p));
+    }
     return row;
   }
+
   const rowsWrap=document.createElement('div');
   rowsWrap.style.cssText='overflow:hidden;border-radius:5px 5px 0 0;flex-shrink:0';
-  rowsWrap.appendChild(makeRow(m.p1,'p1'));rowsWrap.appendChild(makeRow(m.p2,'p2'));
+  rowsWrap.appendChild(makeRow(m.p1,'p1'));
+  rowsWrap.appendChild(makeRow(m.p2,'p2'));
   card.appendChild(rowsWrap);
-
-  // Watch star button
-  const watchBtn=document.createElement('button');
-  watchBtn.className='mc-watch-btn'+(m.watch?' active':'');
-  watchBtn.textContent=m.watch?'★':'☆';
-  watchBtn.title=m.watch?'Remove watch flag':'Flag as a match to watch';
-  watchBtn.addEventListener('click',e=>{
-    e.stopPropagation();
-    m.watch=!m.watch;
-    card.className='mc'+(m.result?' st-'+m.result:'')+(m.watch?' watched':'');
-    watchBtn.className='mc-watch-btn'+(m.watch?' active':'');
-    watchBtn.textContent=m.watch?'★':'☆';
-    watchBtn.title=m.watch?'Remove watch flag':'Flag as a match to watch';
-    saveToStorage();
-  });
-  card.appendChild(watchBtn);
 
   const footer=document.createElement('div');footer.className='mc-footer';
   const sd=document.createElement('div');sd.className='mc-score';
@@ -790,29 +962,38 @@ function placeCard(m,ri,mi,x,y,wrap,rounds){
   inp.addEventListener('click',e=>e.stopPropagation());
   sd.appendChild(inp);footer.appendChild(sd);
 
-  if(m.p1.name||m.p2.name){
+  if(d.locked&&(m.p1.name||m.p2.name)){
     const acts=document.createElement('div');acts.className='mc-acts';
-    const bOk=document.createElement('button');bOk.className='mc-btn'+(m.result==='correct'?' is-ok':'');bOk.textContent='✓';
+
+    // ✓ button: means "the current pick won" — always green when originalPick was correct
+    const bOk=document.createElement('button');
+    bOk.className='mc-btn'+(m.result==='correct'?' is-ok':m.winner&&m.result!=='correct'?' is-bad':'');
+    bOk.textContent='✓';
+    bOk.title=m.winner?'Undo result':'Mark pick as winner';
     bOk.addEventListener('click',e=>{
       e.stopPropagation();
-      if(m.result==='correct'){m.result=null;m.winner=null;placePickInNextRound(ri,mi);saveToStorage();updateStats();renderBracket();return;}
-      if(!m.pick){
-        // No pick set — open a winner picker
-        openWinnerPicker(ri,mi,'correct');return;
-      }
-      applyWinner(ri,mi,m.pick);
+      if(m.winner){undoWinner(d,ri,mi);return;}
+      // ✓ = whoever is currently picked won; if no pick, open picker
+      if(m.pick){applyWinner(d,ri,mi,m.pick);return;}
+      openWinnerPicker(d,ri,mi,name=>applyWinner(d,ri,mi,name));
     });
-    const bBad=document.createElement('button');bBad.className='mc-btn'+(m.result==='wrong'?' is-bad':'');bBad.textContent='✗';
+
+    // ✗ button: means "the other player won"
+    const bBad=document.createElement('button');
+    bBad.className='mc-btn'+(m.result==='wrong'?' is-bad':m.winner&&m.result!=='wrong'?' is-ok':'');
+    bBad.textContent='✗';
+    bBad.title=m.winner?'Undo result':'Mark pick as loser';
     bBad.addEventListener('click',e=>{
       e.stopPropagation();
-      if(m.result==='wrong'){m.result=null;m.winner=null;placePickInNextRound(ri,mi);saveToStorage();updateStats();renderBracket();return;}
-      if(!m.pick){
-        openWinnerPicker(ri,mi,'wrong');return;
+      if(m.winner){undoWinner(d,ri,mi);return;}
+      if(m.pick){
+        const other=m.p1.name===m.pick?m.p2.name:m.p1.name;
+        if(!other){openWinnerPicker(d,ri,mi,name=>applyWinner(d,ri,mi,name));return;}
+        applyWinner(d,ri,mi,other);return;
       }
-      const w=m.p1.name===m.pick?m.p2.name:m.p1.name;
-      if(!w){alert('Both players need names.');return;}
-      applyWinner(ri,mi,w);
+      openWinnerPicker(d,ri,mi,name=>applyWinner(d,ri,mi,name));
     });
+
     acts.appendChild(bOk);acts.appendChild(bBad);footer.appendChild(acts);
   }
   card.appendChild(footer);wrap.appendChild(card);
@@ -829,17 +1010,25 @@ function renderEditScreen(matches,slam,draw,year){
   });
   c.dataset.raw=JSON.stringify(matches);showScreen('screen-edit');
 }
+
 function getEditedMatches(){
   const raw=JSON.parse($('edit-matches-container').dataset.raw||'[]');
-  $('edit-matches-container').querySelectorAll('input').forEach(inp=>{const i=parseInt(inp.dataset.i),f=inp.dataset.f;if(!raw[i])raw[i]={p1_name:'',p1_seed:'',p2_name:'',p2_seed:''};raw[i][f]=inp.value.trim();});
+  $('edit-matches-container').querySelectorAll('input').forEach(inp=>{
+    const i=parseInt(inp.dataset.i),f=inp.dataset.f;
+    if(!raw[i])raw[i]={p1_name:'',p1_seed:'',p2_name:'',p2_seed:''};
+    raw[i][f]=inp.value.trim();
+  });
   return raw;
 }
-['add-match-btn','add-match-btn-b'].forEach(id=>$(id).onclick=()=>{const r=getEditedMatches();r.push({p1_name:'',p1_seed:'',p2_name:'',p2_seed:''});renderEditScreen(r,pendingDraw.slam,pendingDraw.draw,pendingDraw.year);});
+
+['add-match-btn','add-match-btn-b'].forEach(id=>$(id).onclick=()=>{
+  const r=getEditedMatches();r.push({p1_name:'',p1_seed:'',p2_name:'',p2_seed:''});
+  renderEditScreen(r,pendingDraw.slam,pendingDraw.draw,pendingDraw.year);
+});
 
 $('confirm-draw-btn').onclick=()=>{
   const edited=getEditedMatches().filter(m=>m.p1_name||m.p2_name);
-  const newDraw={slam:pendingDraw.slam,draw:pendingDraw.draw,year:pendingDraw.year,rounds:buildInitialState(edited)};
-  // Check for duplicate — replace if same slam+draw+year
+  const newDraw={slam:pendingDraw.slam,draw:pendingDraw.draw,year:pendingDraw.year,locked:false,rounds:buildInitialRounds(edited)};
   const existing=state.draws.findIndex(d=>d.slam===newDraw.slam&&d.draw===newDraw.draw&&d.year===newDraw.year);
   if(existing>=0){state.draws[existing]=newDraw;state.activeTab=existing;}
   else{state.draws.push(newDraw);state.activeTab=state.draws.length-1;}
@@ -847,22 +1036,14 @@ $('confirm-draw-btn').onclick=()=>{
   saveToStorage();showBracketScreen();
 };
 
-// ── UPLOAD SCREEN ──
+// ── UPLOAD / SCREENS ──
 function showUploadScreen(){
-  // Reset upload form
   pdfFile=null;$('file-loaded').style.display='none';$('parse-status').style.display='none';
   $('parse-btn').disabled=true;$('parse-btn').textContent='Parse draw';
   $('pdf-input').value='';$('slam-select').value='';$('draw-select').value='';$('year-input').value='';
   applyTheme('');
-  // Show existing draws if any
-  if(state.draws.length>0){
-    $('existing-draws').style.display='block';
-    $('go-bracket-btn').style.display='inline-block';
-    renderDrawPills();
-  } else {
-    $('existing-draws').style.display='none';
-    $('go-bracket-btn').style.display='none';
-  }
+  if(state.draws.length>0){$('existing-draws').style.display='block';$('go-bracket-btn').style.display='inline-block';renderDrawPills();}
+  else{$('existing-draws').style.display='none';$('go-bracket-btn').style.display='none';}
   showScreen('screen-upload');
 }
 
@@ -872,11 +1053,13 @@ function renderDrawPills(){
     const pill=document.createElement('div');pill.className='draw-pill';
     const name=document.createElement('span');name.className='draw-pill-name';name.textContent=drawLabel(d);
     const meta=document.createElement('span');meta.className='draw-pill-meta';
-    const c=d.rounds.reduce((a,r)=>a+r.matches.filter(m=>m.result==='correct').length,0);
-    const w=d.rounds.reduce((a,r)=>a+r.matches.filter(m=>m.result==='wrong').length,0);
-    meta.textContent=c+' correct, '+w+' wrong';
+    const s=calcStats(d);
+    meta.textContent=d.locked?(s.cOrig+' correct, '+s.wOrig+' wrong'):(s.filled+' picks filled');
     const del=document.createElement('button');del.className='draw-pill-del';del.textContent='×';del.title='Remove';
-    del.addEventListener('click',e=>{e.stopPropagation();state.draws.splice(i,1);saveToStorage();renderDrawPills();if(state.draws.length===0){$('existing-draws').style.display='none';$('go-bracket-btn').style.display='none';}});
+    del.addEventListener('click',e=>{
+      e.stopPropagation();state.draws.splice(i,1);saveToStorage();renderDrawPills();
+      if(state.draws.length===0){$('existing-draws').style.display='none';$('go-bracket-btn').style.display='none';}
+    });
     pill.appendChild(name);pill.appendChild(meta);pill.appendChild(del);
     pill.addEventListener('click',()=>{state.activeTab=i;showBracketScreen();});
     pills.appendChild(pill);
@@ -890,10 +1073,9 @@ function showBracketScreen(){
   const cfg=SLAM_CONFIG[d.slam]||{};
   $('hdr-slam').textContent=(cfg.name||d.slam)+' '+d.year;
   $('hdr-draw').textContent=d.draw+(cfg.surface?' · '+cfg.surface:'');
-  renderTabs();updateStats();renderBracket();showScreen('screen-bracket');
+  renderTabs();updateLockBtn();renderStats();renderBracket();showScreen('screen-bracket');
 }
 
-// ── UPLOAD HANDLERS ──
 function checkReady(){$('parse-btn').disabled=!(pdfFile&&$('slam-select').value&&$('draw-select').value&&$('year-input').value);}
 $('pdf-input').addEventListener('change',e=>{pdfFile=e.target.files[0];if(pdfFile){$('file-loaded').style.display='block';$('file-loaded').textContent='✓ '+pdfFile.name;}checkReady();});
 $('drop-zone').addEventListener('dragover',e=>{e.preventDefault();$('drop-zone').classList.add('drag-over')});
@@ -908,9 +1090,11 @@ $('parse-btn').addEventListener('click',async()=>{
   const btn=$('parse-btn');btn.disabled=true;btn.textContent='Parsing…';
   const slam=$('slam-select').value,draw=$('draw-select').value,year=$('year-input').value;
   try{
-    statusLog('Reading PDF…',true);const text=await extractPdfText(pdfFile);
+    statusLog('Reading PDF…',true);
+    const text=await extractPdfText(pdfFile);
     statusLog('Extracted '+text.length.toLocaleString()+' characters');
-    const matches=parseTnnsText(text);if(!matches.length)throw new Error('No matches found — is this a TNNS Live draw PDF?');
+    const matches=parseTnnsText(text);
+    if(!matches.length)throw new Error('No matches found — is this a TNNS Live draw PDF?');
     statusLog('Parsed '+matches.length+' matches — review below');
     pendingDraw={slam,draw,year};
     renderEditScreen(matches,slam,draw,year);
@@ -919,175 +1103,7 @@ $('parse-btn').addEventListener('click',async()=>{
 
 $('go-bracket-btn').addEventListener('click',()=>showBracketScreen());
 $('add-draw-btn').addEventListener('click',()=>{saveToStorage();showUploadScreen();});
-
-$('print-btn').onclick=()=>{
-  const d=activeDraw();if(!d||!d.rounds||!d.rounds.length)return;
-  const win=window.open('','_blank');
-  if(!win){alert('Please allow popups for this site to use the print function.');return;}
-  try{
-    const html=buildPrintHTML(d);
-    win.document.open();
-    win.document.write(html);
-    win.document.close();
-    // Small delay to let the new window render before print dialog
-    setTimeout(()=>{win.focus();win.print();},400);
-  }catch(err){
-    win.document.write('<pre style="padding:20px;color:red">Print error: '+err.message+'\n'+err.stack+'</pre>');
-    win.document.close();
-  }
-};
-
-function buildPrintHTML(d){
-  const cfg=SLAM_CONFIG[d.slam]||{};
-  const titleStr=(cfg.name||d.slam)+' '+d.year+' — '+d.draw;
-  const rounds=d.rounds;
-  const r1=rounds[0].matches;
-  const total=r1.length;
-  const half=Math.ceil(total/2);
-  const q=Math.ceil(half/2);
-  const drawRounds=rounds.length-1; // R1..SF
-
-  function playerRowHTML(p,m){
-    const isPicked=m.pick&&m.pick===p.name;
-    const isCorrect=isPicked&&m.result==='correct';
-    const isWrong=isPicked&&m.result==='wrong';
-    const isElim=m.winner&&m.winner!==p.name&&p.name&&!isPicked;
-    let bg='',nameStyle='',seedColor='#aaa';
-    if(isCorrect){bg='#edf7ee';nameStyle='font-weight:700;color:#2d7a3a';seedColor='#2d7a3a';}
-    else if(isWrong){bg='#fff0ee';nameStyle='color:#c0392b;text-decoration:line-through;opacity:0.6';}
-    else if(isPicked){bg='#edf2fb';nameStyle='font-weight:700;color:#1a5fb4';seedColor='#1a5fb4';}
-    else if(isElim){nameStyle='opacity:0.3';}
-    const name=p.name||'—';
-    return '<div style="display:flex;align-items:center;gap:3px;padding:1.5px 4px;min-height:12px;border-bottom:0.3pt solid #e8e8e8;background:'+bg+'">'
-      +'<span style="font-family:monospace;font-size:7pt;color:'+seedColor+';min-width:10px;text-align:center;flex-shrink:0">'+escH(p.seed||'')+'</span>'
-      +'<span style="flex:1;font-size:7.5pt;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'+nameStyle+'">'+escH(name)+'</span>'
-      +'</div>';
-  }
-
-  function cardHTML(m){
-    const borderColor=m.result==='correct'?'#2d7a3a':m.result==='wrong'?'#c0392b':m.watch?'#c8900a':'#ccc';
-    const bw=m.watch&&!m.result?'1pt':'0.4pt';
-    let html='<div style="border:'+bw+' solid '+borderColor+';border-radius:2px;overflow:hidden;background:#fff;width:100%">'
-      +playerRowHTML(m.p1,m)
-      +playerRowHTML(m.p2,m);
-    if(m.score){
-      html+='<div style="font-family:monospace;font-size:5.5pt;color:#999;padding:1px 4px;background:#f9f9f9;border-top:0.3pt solid #eee">'+escH(m.score)+'</div>';
-    }
-    html+='</div>';
-    return html;
-  }
-
-  function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-  // Build one half of the bracket as HTML
-  // Uses a flex-row of round columns, each a flex-col of match slots
-  // Match slots use flex:1 so spacing is automatic — no JS math needed
-  function halfHTML(startR1,endR1,showFinal){
-    const flex=[6,3.8,2.6,2,1.8,1.6];
-    let cols='';
-
-    for(let ri=0;ri<drawRounds;ri++){
-      const div=Math.pow(2,ri);
-      const mStart=Math.floor(startR1/div);
-      const mEnd=Math.floor(endR1/div);
-      const slice=rounds[ri].matches.slice(mStart,mEnd);
-      const matchCount=slice.length; // e.g. 16 for R1 half, 1 for SF
-
-      let slots='';
-      slice.forEach((m,localMi)=>{
-        const globalMi=mStart+localMi;
-
-        // Quarter separators in R1 only
-        if(ri===0&&localMi>0){
-          if(globalMi===q||(startR1>=half&&globalMi===half+q)){
-            slots+='<div style="flex:0 0 4px;position:relative"><div style="position:absolute;left:0;right:0;top:50%;border-top:0.5pt dashed #bbb"></div></div>';
-          }
-        }
-
-        // Each match slot takes equal share of column height
-        // Connector arm: top of pair gets bottom border, bottom of pair gets top border
-        // Both get right border to form the bracket arm
-        let armStyle='';
-        if(ri<drawRounds-1){
-          if(localMi%2===0) armStyle='border-right:0.75pt solid #bbb;border-bottom:0.75pt solid #bbb;';
-          else armStyle='border-right:0.75pt solid #bbb;border-top:0.75pt solid #bbb;';
-        }
-
-        slots+='<div style="flex:1;min-height:0;display:flex;align-items:center;padding:1px 0;'+armStyle+'">'+cardHTML(m)+'</div>';
-      });
-
-      // Column: flex-grow for width, flex-direction:column for vertical stacking
-      // height:100% ensures it fills the bracket row height
-      cols+='<div style="flex:'+flex[ri]+' 1 0;min-width:0;display:flex;flex-direction:column;height:100%;overflow:hidden">'+slots+'</div>';
-
-      if(ri<drawRounds-1){
-        cols+='<div style="flex:0 0 3px;height:100%"></div>';
-      }
-    }
-
-    // Final + champion (page 1 only)
-    if(showFinal){
-      const finRound=rounds[rounds.length-1];
-      const finMatch=finRound&&finRound.matches[0];
-      const champName=finMatch&&(finMatch.winner||finMatch.pick)||'—';
-      cols+='<div style="flex:0 0 3px;display:flex;align-items:center"><div style="width:100%;border-top:0.75pt solid #bbb"></div></div>';
-      cols+='<div style="flex:0 0 28mm;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:4mm;padding-left:3px">'
-        +(finMatch?cardHTML(finMatch):'')
-        +'<div style="border:1.5pt solid #222;border-radius:3px;padding:4px 6px;text-align:center">'
-        +'<div style="font-family:monospace;font-size:6pt;text-transform:uppercase;letter-spacing:0.1em;color:#666;margin-bottom:3px">Champion</div>'
-        +'<div style="font-family:Georgia,serif;font-size:10pt;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escH(champName)+'</div>'
-        +'</div>'
-        +'</div>';
-    }
-
-    // The bracket row: display:flex, height fills remaining page space
-    return '<div style="display:flex;flex:1;width:100%;min-height:0;align-items:stretch">'+cols+'</div>';
-  }
-
-
-  function roundLabelsHTML(showFinal){
-    const flex=[6,3.8,2.6,2,1.8,1.6];
-    let html='<div style="display:flex;width:100%;margin-bottom:3px;flex-shrink:0">';
-    rounds.slice(0,drawRounds).forEach((r,ri)=>{
-      html+='<div style="flex:'+flex[ri]+' 1 0;text-align:center;font-family:monospace;font-size:6.5pt;text-transform:uppercase;letter-spacing:0.06em;color:#999;border-bottom:0.5pt solid #ccc;padding-bottom:2px">'+escH(r.label)+'</div>';
-      if(ri<drawRounds-1)html+='<div style="flex:0 0 3px"></div>';
-    });
-    if(showFinal){
-      html+='<div style="flex:0 0 3px"></div>';
-      html+='<div style="flex:0 0 28mm;text-align:center;font-family:monospace;font-size:6.5pt;text-transform:uppercase;letter-spacing:0.06em;color:#999;border-bottom:0.5pt solid #ccc;padding-bottom:2px">Final</div>';
-    }
-    html+='</div>';
-    return html;
-  }
-
-  function pageHTML(startR1,endR1,pageLabel,showFinal){
-    return '<div style="width:408mm;height:282mm;overflow:hidden;display:flex;flex-direction:column;page-break-after:always;box-sizing:border-box;padding:0">'
-      // Header
-      +'<div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:0.75pt solid #888;padding-bottom:2px;margin-bottom:2px;flex-shrink:0">'
-      +'<span style="font-family:Georgia,serif;font-size:15pt;font-weight:600">'+escH(titleStr)+'</span>'
-      +'<span style="font-family:monospace;font-size:6pt;color:#666">'+escH(pageLabel)+'</span>'
-      +'</div>'
-      +roundLabelsHTML(showFinal)
-      +halfHTML(startR1,endR1,showFinal)
-      +'</div>';
-  }
-
-  const pages=pageHTML(0,half,'Top half · Q1 & Q2 · page 1 of 2',true)
-             +pageHTML(half,total,'Bottom half · Q3 & Q4 · page 2 of 2',false);
-
-  return '<!DOCTYPE html><html><head><meta charset="UTF-8">'
-    +'<title>'+escH(titleStr)+'</title>'
-    +'<style>'
-    +'@page{size:A3 landscape;margin:8mm}'
-    +'*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}'
-    +'body{background:#fff;font-family:Arial,sans-serif}'
-    +'@media screen{body{padding:10mm;background:#eee} div[style*="page-break"]{margin-bottom:10mm;box-shadow:0 2px 12px rgba(0,0,0,0.15);background:#fff}}'
-    +'</style></head><body>'+pages+'</body></html>';
-}
-
-
 $('save-btn').onclick=triggerDownload;
-
 $('load-saved-btn').onclick=()=>$('load-json-input').click();
 $('load-json-input').addEventListener('change',e=>{
   const f=e.target.files[0];if(!f)return;
@@ -1095,9 +1111,8 @@ $('load-json-input').addEventListener('change',e=>{
   r.onload=ev=>{
     try{
       const loaded=JSON.parse(ev.target.result);
-      // Support both old single-draw format and new multi-draw format
-      if(loaded.draws){state=loaded;}
-      else if(loaded.rounds){state={draws:[loaded],activeTab:0};}
+      if(loaded.draws){state=migrateState(loaded);}
+      else if(loaded.rounds){state=migrateState({draws:[loaded],activeTab:0});}
       else{alert('Unrecognised file format.');return;}
       if(state.draws.length===0){showUploadScreen();return;}
       state.activeTab=Math.min(state.activeTab||0,state.draws.length-1);
@@ -1107,13 +1122,129 @@ $('load-json-input').addEventListener('change',e=>{
   r.readAsText(f);
 });
 
+// ── PRINT ──
+$('print-btn').onclick=()=>{
+  const d=activeDraw();if(!d||!d.rounds||!d.rounds.length)return;
+  const win=window.open('','_blank');
+  if(!win){alert('Please allow popups for this site.');return;}
+  try{win.document.open();win.document.write(buildPrintHTML(d));win.document.close();setTimeout(()=>{win.focus();win.print();},400);}
+  catch(err){win.document.write('<pre style="padding:20px;color:red">'+err.message+'</pre>');win.document.close();}
+};
+
+function buildPrintHTML(d){
+  const cfg=SLAM_CONFIG[d.slam]||{};
+  const titleStr=(cfg.name||d.slam)+' '+d.year+' — '+d.draw;
+  const rounds=d.rounds;
+  const r1=rounds[0].matches;
+  const total=r1.length,half=Math.ceil(total/2),q=Math.ceil(half/2);
+  const drawRounds=rounds.length-1;
+
+  function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  function playerRowHTML(p,m){
+    const isOrig=m.originalPick&&m.originalPick===p.name;
+    const isPick=m.pick&&m.pick===p.name;
+    const backup=isBackupPick(m);
+    const isBackupRow=isPick&&backup;
+    const backupWrong=isBackupRow&&m.winner&&m.winner!==p.name;
+    const isElim=m.winner&&m.winner!==p.name&&p.name&&!isPick;
+    let bg='',nameStyle='',seedColor='#aaa';
+    if(isOrig&&m.result==='correct'){bg='#edf7ee';nameStyle='font-weight:700;color:#2d7a3a';seedColor='#2d7a3a';}
+    else if(isOrig&&m.result==='wrong'){bg='#fdf0ee';nameStyle='color:#c0392b;text-decoration:line-through;opacity:0.6';}
+    else if(isBackupRow&&backupWrong){bg='#f3edfb';nameStyle='color:#6b3fa0;text-decoration:line-through;opacity:0.6';seedColor='#6b3fa0';}
+    else if(isBackupRow){bg='#f3edfb';nameStyle='font-weight:700;color:#6b3fa0';seedColor='#6b3fa0';}
+    else if(isPick){bg='#edf2fb';nameStyle='font-weight:700;color:#1a5fb4';seedColor='#1a5fb4';}
+    else if(isElim){nameStyle='opacity:0.3';}
+    const name=p.name||'—';
+    return '<div style="display:flex;align-items:center;gap:3px;padding:1.5px 4px;min-height:12px;border-bottom:0.3pt solid #e8e8e8;background:'+bg+'">'
+      +'<span style="font-family:monospace;font-size:7pt;color:'+seedColor+';min-width:10px;text-align:center;flex-shrink:0">'+escH(p.seed||'')+'</span>'
+      +'<span style="flex:1;font-size:7.5pt;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'+nameStyle+'">'+escH(name)+'</span>'
+      +'</div>';
+  }
+
+  function cardHTML(m){
+    const borderColor=m.result==='correct'?'#a8d4ae':m.result==='wrong'?'#f0b8b2':'#ccc';
+    return '<div style="border:0.5pt solid '+borderColor+';border-radius:2px;overflow:hidden;background:#fff;width:100%">'
+      +playerRowHTML(m.p1,m)+playerRowHTML(m.p2,m)
+      +(m.score?'<div style="font-family:monospace;font-size:5.5pt;color:#999;padding:1px 4px;background:#f9f9f9;border-top:0.3pt solid #eee">'+escH(m.score)+'</div>':'')
+      +'</div>';
+  }
+
+  function halfHTML(startR1,endR1,showFinal){
+    const flex=[6,3.8,2.6,2,1.8,1.6];
+    let cols='';
+    for(let ri=0;ri<drawRounds;ri++){
+      const div=Math.pow(2,ri);
+      const slice=rounds[ri].matches.slice(Math.floor(startR1/div),Math.floor(endR1/div));
+      let slots='';
+      slice.forEach((m,localMi)=>{
+        const globalMi=Math.floor(startR1/div)+localMi;
+        if(ri===0&&localMi>0){
+          if(globalMi===q||(startR1>=half&&globalMi===half+q))
+            slots+='<div style="flex:0 0 4px;position:relative"><div style="position:absolute;left:0;right:0;top:50%;border-top:0.5pt dashed #bbb"></div></div>';
+        }
+        let arm='';
+        if(ri<drawRounds-1){
+          arm=localMi%2===0?'border-right:0.75pt solid #bbb;border-bottom:0.75pt solid #bbb;':'border-right:0.75pt solid #bbb;border-top:0.75pt solid #bbb;';
+        }
+        slots+='<div style="flex:1;min-height:0;display:flex;align-items:center;padding:1px 0;'+arm+'">'+cardHTML(m)+'</div>';
+      });
+      cols+='<div style="flex:'+flex[ri]+' 1 0;min-width:0;display:flex;flex-direction:column;height:100%;overflow:hidden">'+slots+'</div>';
+      if(ri<drawRounds-1)cols+='<div style="flex:0 0 3px;height:100%"></div>';
+    }
+    if(showFinal){
+      const finMatch=rounds[rounds.length-1].matches[0];
+      const champName=escH((finMatch&&(finMatch.winner||finMatch.pick))||'—');
+      cols+='<div style="flex:0 0 3px;display:flex;align-items:center"><div style="width:100%;border-top:0.75pt solid #bbb"></div></div>';
+      cols+='<div style="flex:0 0 28mm;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:4mm;padding-left:3px">'
+        +(finMatch?cardHTML(finMatch):'')
+        +'<div style="border:1.5pt solid #222;border-radius:3px;padding:4px 6px;text-align:center">'
+        +'<div style="font-family:monospace;font-size:6pt;text-transform:uppercase;letter-spacing:0.1em;color:#666;margin-bottom:3px">Champion</div>'
+        +'<div style="font-family:Georgia,serif;font-size:10pt;font-weight:600">'+champName+'</div>'
+        +'</div></div>';
+    }
+    return '<div style="display:flex;flex:1;width:100%;min-height:0;align-items:stretch">'+cols+'</div>';
+  }
+
+  function roundLabelsHTML(showFinal){
+    const flex=[6,3.8,2.6,2,1.8,1.6];
+    let html='<div style="display:flex;width:100%;margin-bottom:3px;flex-shrink:0">';
+    rounds.slice(0,drawRounds).forEach((r,ri)=>{
+      html+='<div style="flex:'+flex[ri]+' 1 0;text-align:center;font-family:monospace;font-size:6.5pt;text-transform:uppercase;letter-spacing:0.06em;color:#999;border-bottom:0.5pt solid #ccc;padding-bottom:2px">'+escH(r.label)+'</div>';
+      if(ri<drawRounds-1)html+='<div style="flex:0 0 3px"></div>';
+    });
+    if(showFinal){
+      html+='<div style="flex:0 0 3px"></div><div style="flex:0 0 28mm;text-align:center;font-family:monospace;font-size:6.5pt;text-transform:uppercase;letter-spacing:0.06em;color:#999;border-bottom:0.5pt solid #ccc;padding-bottom:2px">Final</div>';
+    }
+    return html+'</div>';
+  }
+
+  function pageHTML(startR1,endR1,pageLabel,showFinal){
+    return '<div style="width:408mm;height:282mm;overflow:hidden;display:flex;flex-direction:column;page-break-after:always;box-sizing:border-box;padding:0">'
+      +'<div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:0.75pt solid #888;padding-bottom:2px;margin-bottom:2px;flex-shrink:0">'
+      +'<span style="font-family:Georgia,serif;font-size:15pt;font-weight:600">'+escH(titleStr)+'</span>'
+      +'<span style="font-family:monospace;font-size:6pt;color:#666">'+escH(pageLabel)+'</span>'
+      +'</div>'
+      +roundLabelsHTML(showFinal)+halfHTML(startR1,endR1,showFinal)+'</div>';
+  }
+
+  return '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+escH(titleStr)+'</title>'
+    +'<style>@page{size:A3 landscape;margin:8mm}*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}body{background:#fff;font-family:Arial,sans-serif}'
+    +'@media screen{body{padding:10mm;background:#eee}div[style*="page-break"]{margin-bottom:10mm;box-shadow:0 2px 12px rgba(0,0,0,0.15);background:#fff}}'
+    +'</style></head><body>'
+    +pageHTML(0,half,'Top half · Q1 & Q2 · page 1 of 2',true)
+    +pageHTML(half,total,'Bottom half · Q3 & Q4 · page 2 of 2',false)
+    +'</body></html>';
+}
+
+// ── INIT ──
 window.addEventListener('load',()=>{
   const saved=localStorage.getItem('slam_bracket');
   if(saved){
     try{
       const p=JSON.parse(saved);
-      if(p.draws&&p.draws.length){state=p;state.activeTab=Math.min(state.activeTab||0,state.draws.length-1);showBracketScreen();return;}
-      if(p.rounds&&p.rounds.length){state={draws:[p],activeTab:0};showBracketScreen();return;}
+      if(p.draws&&p.draws.length){state=migrateState(p);state.activeTab=Math.min(state.activeTab||0,state.draws.length-1);showBracketScreen();return;}
+      if(p.rounds&&p.rounds.length){state=migrateState({draws:[p],activeTab:0});showBracketScreen();return;}
     }catch{}
   }
   showUploadScreen();
