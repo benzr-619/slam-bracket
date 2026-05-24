@@ -55,6 +55,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .btn-secondary{background:var(--surface);border:1px solid var(--border2);color:var(--text);padding:7px 13px;border-radius:6px;font-family:var(--sans);font-size:13px;cursor:pointer;transition:all 0.15s}
 .btn-secondary:hover{border-color:var(--accent);background:var(--accent-dim)}
 .btn-lock-on{background:var(--red-bg)!important;border-color:var(--red-border)!important;color:var(--red)!important}
+/* lock toggle switch */
+.lock-switch{display:flex;align-items:center;gap:7px;cursor:pointer;flex-shrink:0;user-select:none}
+.lock-switch-track{width:36px;height:20px;border-radius:10px;background:var(--border2);position:relative;transition:background 0.2s;flex-shrink:0}
+.lock-switch-track.on{background:var(--accent)}
+.lock-switch-knob{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);transition:transform 0.2s}
+.lock-switch-track.on .lock-switch-knob{transform:translateX(16px)}
+.lock-switch-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);transition:color 0.2s;white-space:nowrap}
+.lock-switch.on .lock-switch-label{color:var(--accent)}
 .parse-status{margin-top:.75rem;padding:10px 12px;background:var(--surface2);border-radius:7px;border:1px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--text2);display:none;line-height:1.9;white-space:pre-wrap}
 .divider{height:1px;background:var(--border);margin:18px 0}
 .existing-draws{margin-bottom:1.5rem}
@@ -298,7 +306,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
       </div>
     </div>
     <div class="hdr-right">
-      <button class="btn-secondary" id="lock-btn">🔓 Picks open</button>
+      <div class="lock-switch" id="lock-switch">
+        <div class="lock-switch-track" id="lock-track"><div class="lock-switch-knob"></div></div>
+        <span class="lock-switch-label" id="lock-label">Unlocked</span>
+      </div>
       <button class="btn-secondary" id="print-btn">⎙ Print</button>
       <div style="position:relative;display:flex;align-items:center">
         <button class="btn-secondary" id="save-btn">Save</button>
@@ -541,13 +552,17 @@ function unlockDraw(){
 }
 
 function updateLockBtn(){
-  const btn=$('lock-btn');if(!btn)return;
+  const sw=$('lock-switch');
+  const track=$('lock-track');
+  const label=$('lock-label');
+  if(!sw)return;
   const locked=activeDraw()&&activeDraw().locked;
-  btn.textContent=locked?'🔒 Locked':'🔓 Picks open';
-  btn.className='btn-secondary'+(locked?' btn-lock-on':'');
+  track.className='lock-switch-track'+(locked?' on':'');
+  sw.className='lock-switch'+(locked?' on':'');
+  label.textContent=locked?'Locked':'Unlocked';
 }
 
-$('lock-btn').addEventListener('click',()=>{
+$('lock-switch').addEventListener('click',()=>{
   const d=activeDraw();if(!d)return;
   if(d.locked)unlockDraw();else lockDraw();
 });
@@ -897,15 +912,15 @@ function renderHeader(){
       const key=slamKey(d);
       const slams=uniqueSlams();
       // Only show seg if active slam has draws; also show all draw types
-      const DRAW_TYPES=['MS','WS'];
-      DRAW_TYPES.forEach(dt=>{
+      const DRAW_TYPES=[{key:'MS',label:"Men's"},{key:'WS',label:"Women's"}];
+      DRAW_TYPES.forEach(({key,label})=>{
         const btn=document.createElement('button');
         btn.className='seg-btn';
-        btn.textContent=dt;
-        const match=state.draws.find(x=>slamKey(x)===key&&x.draw===dt);
+        btn.textContent=label;
+        const match=state.draws.find(x=>slamKey(x)===slamKey(d)&&x.draw===key);
         if(!match){btn.disabled=true;}
         else{
-          if(d.draw===dt)btn.classList.add('active');
+          if(d.draw===key)btn.classList.add('active');
           btn.addEventListener('click',()=>{
             const idx=state.draws.indexOf(match);
             if(idx>=0)switchTab(idx);
@@ -1282,14 +1297,14 @@ function placeCard(d,m,ri,mi,x,y,wrap){
   rowsWrap.appendChild(makeRow(m.p2,'p2'));
   card.appendChild(rowsWrap);
 
-  const footer=document.createElement('div');footer.className='mc-footer';
-  const sd=document.createElement('div');sd.className='mc-score';
-  const inp=document.createElement('input');inp.type='text';inp.placeholder='Score…';inp.value=m.score||'';
-  inp.addEventListener('change',e=>{m.score=e.target.value.trim();saveToStorage();});
-  inp.addEventListener('click',e=>e.stopPropagation());
-  sd.appendChild(inp);footer.appendChild(sd);
-
   if(d.locked&&(m.p1.name||m.p2.name)){
+    const footer=document.createElement('div');footer.className='mc-footer';
+    const sd=document.createElement('div');sd.className='mc-score';
+    const inp=document.createElement('input');inp.type='text';inp.placeholder='Score…';inp.value=m.score||'';
+    inp.addEventListener('change',e=>{m.score=e.target.value.trim();saveToStorage();});
+    inp.addEventListener('click',e=>e.stopPropagation());
+    sd.appendChild(inp);footer.appendChild(sd);
+
     const acts=document.createElement('div');acts.className='mc-acts';
 
     // ✓ button: means "the current pick won" — always green when originalPick was correct
@@ -1322,8 +1337,9 @@ function placeCard(d,m,ri,mi,x,y,wrap){
     });
 
     acts.appendChild(bOk);acts.appendChild(bBad);footer.appendChild(acts);
+    card.appendChild(footer);
   }
-  card.appendChild(footer);wrap.appendChild(card);
+  wrap.appendChild(card);
 }
 
 // ── EDIT SCREEN ──
