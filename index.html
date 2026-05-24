@@ -348,8 +348,8 @@ function calcUpsetValue(winnerSeedStr,loserSeedStr){
     // Seeded beats unseeded: chalk, no bonus
     upsetVal=0;
   } else if(!winnerSeeded&&loserSeeded){
-    // Unseeded beats seeded: true upset
-    upsetVal=33-ls;
+    // Unseeded beats seeded: true upset, minimum 10 to always exceed unseeded vs unseeded
+    upsetVal=Math.max(33-ls,10);
   } else {
     // Unseeded vs unseeded: flat coin-flip bonus
     upsetVal=5;
