@@ -490,7 +490,7 @@ function renderStats(){
     pill('base',s.baseScore,'','Points for correct original picks. Increases each round: 1pt in R1 up to 7pts in the Final.');
     pill('skill bonus','+'+s.skillBonus.toFixed(1),'','Upset reward: round multiplier × upset value based on seeding.');
     pill('total',total,'vg','Base + skill bonus combined. Your overall bracket performance score.');
-    pill('chalk',chalk.chalkTotal,'','Score a pure chalk picker would have earned: always picks the favorite, splits unseeded vs unseeded 50/50.');
+    pill('chalk',chalk.chalkTotal,'','Score if you always picked the higher seed, splits unseeded vs unseeded 50/50.');
     divider();
     pill('bracket acc',bracketAcc,'','How often your pre-tournament picks were right. Only counts matches you predicted before locking.');
     pill('match acc',matchAcc,'','How often you picked the right winner while knowing who was playing — includes backup picks made during the tournament.');
