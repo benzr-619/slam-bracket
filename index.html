@@ -626,12 +626,13 @@ function undoWinner(d,ri,mi){
   const m=d.rounds[ri].matches[mi];
   const wasWinner=m.winner;
   m.winner=null;m.result=null;
-  // Remove winner from next slot if it's still there
+  // Remove winner from next slot and restore the original pick if there was one
   const next=getNextSlot(d,ri,mi);
   if(next&&wasWinner){
     const nm=d.rounds[next.nri].matches[next.nmi];
     if(!nm.winner&&nm[next.side].name===wasWinner){
-      nm[next.side]={name:'',seed:''};
+      const origName=m.originalPick||null;
+      nm[next.side]=origName?{name:origName,seed:findSeed(d,origName)}:{name:'',seed:''};
     }
   }
   saveToStorage();renderStats();renderBracket();
