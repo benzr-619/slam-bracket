@@ -85,34 +85,64 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 
 /* ── BRACKET ── */
 #screen-bracket{flex-direction:column;background:var(--bg)}
-.tabs-bar{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:stretch;flex-shrink:0;overflow-x:auto}
-.tab{display:flex;align-items:center;gap:6px;padding:0 18px;height:44px;font-size:12px;font-family:var(--mono);color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.15s;border-top:none;border-left:none;border-right:none;background:none}
-.tab:hover{color:var(--text);background:var(--surface2)}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:500}
-.tab-dot{width:7px;height:7px;border-radius:50%;background:var(--border2)}
-.tab.active .tab-dot{background:var(--accent)}
-.tab-add{padding:0 14px;height:44px;font-size:18px;color:var(--text3);cursor:pointer;border:none;background:none;border-left:1px solid var(--border);margin-left:auto;flex-shrink:0;transition:all 0.15s}
-.tab-add:hover{color:var(--accent);background:var(--surface2)}
-.tab-close{font-size:14px;color:var(--text3);padding:2px 4px;border-radius:3px;border:none;background:none;cursor:pointer;line-height:1;margin-left:2px}
-.tab-close:hover{color:var(--red);background:var(--red-bg)}
 
-/* ── BRACKET HEADER ── */
-.bracket-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:stretch;flex-shrink:0;height:52px;gap:0;overflow:visible;position:relative;z-index:10}
-.bracket-title{display:flex;align-items:center;padding-right:20px;border-right:1px solid var(--border);flex-shrink:0}
-.slam-name{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--accent)}
-.draw-name{font-size:11px;color:var(--text3);font-family:var(--mono)}
-.stats-strip{display:flex;align-items:center;flex:1;padding:0 4px;overflow:visible;gap:0}
+/* ── HEADER ROW 1 ── */
+.hdr-row1{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;flex-shrink:0;height:48px;padding:0 16px;gap:12px;position:relative;z-index:20;overflow:visible}
+.hdr-left{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.slam-dropdown-btn{display:flex;align-items:center;gap:6px;background:none;border:1px solid var(--border2);border-radius:6px;padding:5px 10px;font-family:var(--serif);font-size:14px;font-weight:600;color:var(--accent);cursor:pointer;white-space:nowrap;transition:all 0.15s}
+.slam-dropdown-btn:hover{background:var(--accent-dim)}
+.slam-dropdown-btn .chevron{font-size:9px;color:var(--text3);transition:transform 0.15s}
+.slam-dropdown-btn.open .chevron{transform:rotate(180deg)}
+.slam-dropdown-menu{position:absolute;top:calc(100% + 4px);left:16px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);min-width:200px;z-index:100;overflow:hidden;display:none}
+.slam-dropdown-menu.open{display:block}
+.slam-dropdown-item{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;font-family:var(--sans);font-size:13px;cursor:pointer;gap:12px;transition:background 0.1s}
+.slam-dropdown-item:hover{background:var(--surface2)}
+.slam-dropdown-item.active{color:var(--accent);font-weight:500}
+.slam-dropdown-item-del{font-size:12px;color:var(--text3);padding:1px 5px;border-radius:3px;border:none;background:none;cursor:pointer}
+.slam-dropdown-item-del:hover{color:var(--red);background:var(--red-bg)}
+/* segmented control */
+.seg-control{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:2px;gap:2px;flex-shrink:0}
+.seg-btn{padding:4px 12px;border:none;border-radius:4px;background:none;font-family:var(--mono);font-size:11px;color:var(--text2);cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.seg-btn:hover:not(:disabled){background:var(--surface);color:var(--text)}
+.seg-btn.active{background:var(--surface);color:var(--accent);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.seg-btn:disabled{opacity:0.35;cursor:not-allowed}
+/* search */
+.hdr-center{flex:1;display:flex;align-items:center;justify-content:center;padding:0 12px;min-width:0}
+.search-wrap{position:relative;display:flex;align-items:center;width:100%;max-width:320px}
+.search-icon-btn{background:none;border:1px solid var(--border2);border-radius:6px;padding:5px 9px;cursor:pointer;color:var(--text3);font-size:14px;transition:all 0.15s;flex-shrink:0}
+.search-icon-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.search-input-wrap{position:relative;flex:1;display:flex;align-items:center}
+.search-input{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:5px 10px 5px 30px;font-family:var(--sans);font-size:13px;color:var(--text);outline:none;transition:border-color 0.15s}
+.search-input:focus{border-color:var(--accent)}
+.search-input-icon{position:absolute;left:9px;font-size:12px;color:var(--text3);pointer-events:none}
+.search-clear{position:absolute;right:8px;background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;padding:0;line-height:1;display:none}
+.search-clear.visible{display:block}
+.search-results{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);border:1px solid var(--border2);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);z-index:100;max-height:360px;overflow-y:auto;display:none}
+.search-results.open{display:block}
+.search-group-label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);padding:8px 12px 4px;border-top:1px solid var(--border)}
+.search-group-label:first-child{border-top:none}
+.search-result-item{display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;transition:background 0.1s}
+.search-result-item:hover{background:var(--surface2)}
+.search-result-round{font-family:var(--mono);font-size:9px;color:var(--text3);min-width:24px;flex-shrink:0}
+.search-result-name{font-size:12px;font-weight:500;flex:1}
+.search-result-vs{font-size:11px;color:var(--text2)}
+.search-no-results{padding:16px 12px;font-size:12px;color:var(--text3);text-align:center}
+/* right actions */
+.hdr-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+
+/* ── HEADER ROW 2 (stats) ── */
+.hdr-row2{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:stretch;flex-shrink:0;height:40px;overflow:visible;position:relative;z-index:10}
+.stats-strip{display:flex;align-items:center;flex:1;overflow:visible;gap:0}
 .stat-pill{display:flex;align-items:center;gap:5px;padding:0 14px;border-right:1px solid var(--border);height:100%;flex-shrink:0;position:relative;cursor:default;transition:background 0.1s}
-.stat-pill:first-child{padding-left:14px}
+.stat-pill:first-child{padding-left:18px}
 .stat-pill:hover{background:var(--surface2)}
-.stat-divider{width:1px;background:var(--border2);height:60%;flex-shrink:0;margin:0 4px}
+.stat-divider{width:1px;background:var(--border2);height:60%;flex-shrink:0;margin:0 6px}
 .slbl{color:var(--text3);font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap}
-.sval{font-family:var(--mono);font-size:15px;font-weight:500}
+.sval{font-family:var(--mono);font-size:14px;font-weight:500}
 .vg{color:var(--green)}.vr{color:var(--red)}
-.header-actions{display:flex;align-items:center;gap:8px;padding-left:14px;flex-shrink:0}
-/* stat description bar */
+/* stat description bar — sits below row 2 */
 .stat-desc-bar{position:absolute;top:100%;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--border);padding:0 22px;height:0;overflow:hidden;display:flex;align-items:center;gap:10px;z-index:9;transition:height 0.15s}
-.stat-desc-bar.visible{height:34px}
+.stat-desc-bar.visible{height:32px}
 .stat-desc-label{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap;flex-shrink:0}
 .stat-desc-text{font-family:var(--sans);font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
@@ -247,20 +277,39 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 
 <!-- BRACKET -->
 <div id="screen-bracket" class="screen">
-  <div class="tabs-bar" id="tabs-bar"></div>
-  <div class="bracket-header">
-    <div class="bracket-title">
-      <div><div class="slam-name" id="hdr-slam"></div><div class="draw-name" id="hdr-draw"></div></div>
+  <!-- ROW 1: nav + search + actions -->
+  <div class="hdr-row1" id="hdr-row1">
+    <div class="hdr-left">
+      <button class="slam-dropdown-btn" id="slam-dropdown-btn">
+        <span id="slam-dropdown-label">—</span>
+        <span class="chevron">▾</span>
+      </button>
+      <div class="slam-dropdown-menu" id="slam-dropdown-menu"></div>
+      <div class="seg-control" id="seg-control"></div>
     </div>
-    <div class="stats-strip" id="stats-strip">
-      <!-- populated by renderStats() based on lock state -->
+    <div class="hdr-center">
+      <div class="search-wrap" id="search-wrap">
+        <div class="search-input-wrap">
+          <span class="search-input-icon">🔍</span>
+          <input class="search-input" id="search-input" type="text" placeholder="Search players…" autocomplete="off">
+          <button class="search-clear" id="search-clear">×</button>
+        </div>
+        <div class="search-results" id="search-results"></div>
+      </div>
     </div>
-    <div class="header-actions">
+    <div class="hdr-right">
       <button class="btn-secondary" id="lock-btn">🔓 Picks open</button>
       <button class="btn-secondary" id="print-btn">⎙ Print</button>
-      <button class="btn-secondary" id="save-btn">Save</button>
+      <div style="position:relative;display:flex;align-items:center">
+        <button class="btn-secondary" id="save-btn">Save</button>
+        <span id="storage-warn" title="" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;border-radius:50%;width:14px;height:14px;font-size:9px;align-items:center;justify-content:center;cursor:default;z-index:5">⚠</span>
+      </div>
       <button class="btn-secondary" id="add-draw-btn">+ Draw</button>
     </div>
+  </div>
+  <!-- ROW 2: stats -->
+  <div class="hdr-row2">
+    <div class="stats-strip" id="stats-strip"></div>
     <div class="stat-desc-bar" id="stat-desc-bar">
       <span class="stat-desc-label" id="stat-desc-label"></span>
       <span class="stat-desc-text" id="stat-desc-text"></span>
@@ -426,9 +475,11 @@ function renderStats(){
     const bracketAcc=origRes>0?Math.round(s.cOrig/origRes*100)+'%':'—';
     const matchAcc=allRes>0?Math.round((s.cOrig+s.cBackup)/allRes*100)+'%':'—';
     const total=(s.baseScore+s.skillBonus).toFixed(1);
+    const chalk=calcChalkScore(d);
     pill('base',s.baseScore,'','Points for correct original picks. Increases each round: 1pt in R1 up to 7pts in the Final.');
-    pill('skill bonus','+'+s.skillBonus.toFixed(1),'','Upset reward: round multiplier × upset value based on seeding. Bigger upsets in later rounds score more. A shocking R1 upset scores differently than a late-round one.');
+    pill('skill bonus','+'+s.skillBonus.toFixed(1),'','Upset reward: round multiplier × upset value based on seeding.');
     pill('total',total,'vg','Base + skill bonus combined. Your overall bracket performance score.');
+    pill('chalk',chalk.chalkTotal,'','Score a pure chalk picker would have earned: always picks the favorite, splits unseeded vs unseeded 50/50.');
     divider();
     pill('bracket acc',bracketAcc,'','How often your pre-tournament picks were right. Only counts matches you predicted before locking.');
     pill('match acc',matchAcc,'','How often you picked the right winner while knowing who was playing — includes backup picks made during the tournament.');
@@ -455,7 +506,11 @@ function doUnlock(){
       m.pick=m.originalPick||m.pick;
       m.originalPick=null;
     }));
-    d.rounds.forEach((r,ri)=>r.matches.forEach((m,mi)=>placePickInNextRound(d,ri,mi)));
+    // Clear all cascaded player slots first, then re-cascade all picks fully
+    d.rounds.forEach((r,ri)=>r.matches.forEach((m,mi)=>{
+      if(ri>0){m.p1={name:'',seed:''};m.p2={name:'',seed:''};}
+    }));
+    d.rounds[0].matches.forEach((m,mi)=>placePickAllRounds(d,0,mi));
   } else {
     d.rounds.forEach(r=>r.matches.forEach(m=>{m.originalPick=null;}));
   }
@@ -523,23 +578,6 @@ function placePickInNextRound(d,ri,mi){
   }
 }
 
-function cascadePicksFrom(d,ri,mi){
-  // Walk forward from this match, placing picks into subsequent rounds
-  let r=ri,m=mi;
-  while(true){
-    placePickInNextRound(d,r,m);
-    const next=getNextSlot(d,r,m);
-    if(!next)break;
-    const nm=d.rounds[next.nri].matches[next.nmi];
-    // Stop if next match already has a winner or the slot we'd fill isn't our pick
-    if(nm.winner)break;
-    r=next.nri;m=next.nmi;
-    // Only continue if the pick in the next match is ours (avoid overwriting unrelated picks)
-    const side=getNextSlot(d,r-1<0?0:r-1,Math.floor(m/2))?.side; // just stop here
-    break; // placePickInNextRound handles one step; cascade is called per-match on set
-  }
-}
-
 function handlePickClick(ri,mi,p){
   const d=activeDraw();if(!d)return;
   const m=d.rounds[ri].matches[mi];
@@ -568,21 +606,21 @@ function handlePickClick(ri,mi,p){
 }
 
 function placePickAllRounds(d,ri,mi){
-  // Cascade pick forward through all rounds until we hit a confirmed winner
   let r=ri,m=mi;
   while(true){
-    placePickInNextRound(d,r,m);
     const next=getNextSlot(d,r,m);
     if(!next)break;
     const nm=d.rounds[next.nri].matches[next.nmi];
     if(nm.winner)break;
-    // Only continue if the slot we just wrote is the pick in the next match
-    // (don't overwrite independently-made picks in downstream matches)
-    const side=mi%2===0?'p1':'p2'; // side of current match in next match — recalc
+    // Check if the slot we're about to fill currently holds our pick's name
+    // (i.e. it was cascaded from us, not independently set)
+    const currentInSlot=nm[next.side]?.name;
+    const currentMatch=d.rounds[r].matches[m];
+    const pickName=currentMatch.pick;
+    // Stop if there's something in this slot that isn't our pick (independently set)
+    if(currentInSlot&&currentInSlot!==pickName)break;
+    placePickInNextRound(d,r,m);
     r=next.nri;m=next.nmi;
-    // Stop if next match has its own independent pick already
-    // (i.e. our cascaded name is not picked there)
-    if(nm.pick&&nm.pick!==d.rounds[r].matches[m][m%2===0?'p1':'p2']?.name)break;
   }
 }
 
@@ -723,16 +761,56 @@ $('epm-confirm').addEventListener('click',confirmEditPlayer);
 $('edit-player-modal').addEventListener('click',e=>{if(e.target===$('edit-player-modal'))closeModal();});
 
 // ── STORAGE ──
-function saveToStorage(){localStorage.setItem('slam_bracket',JSON.stringify(state));}
+const STORAGE_KEY='slam_bracket';
+const STORAGE_WARN_BYTES=4*1024*1024; // 4MB
+
+function saveToStorage(){
+  const json=JSON.stringify(state);
+  try{
+    localStorage.setItem(STORAGE_KEY,json);
+  }catch(e){
+    console.warn('localStorage write failed',e);
+  }
+  // Check size and show warning if approaching limit
+  const bytes=new Blob([json]).size;
+  const warn=$('storage-warn');
+  if(warn){
+    if(bytes>STORAGE_WARN_BYTES){
+      warn.style.display='flex';
+      warn.title=`Autosave storage is ${(bytes/1024/1024).toFixed(1)}MB — consider removing old draws to free space.`;
+    } else {
+      warn.style.display='none';
+    }
+  }
+}
+
+// Save only active slam+year draws to a scoped JSON file
 function triggerDownload(){
-  const ad=activeDraw();
-  const slug=ad?(ad.slam+'-'+ad.year).replace(/[^a-zA-Z0-9]+/g,'-'):'slam-bracket';
-  const b=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='slam-bracket-'+slug+'.json';a.click();
+  const d=activeDraw();if(!d)return;
+  const key=slamKey(d);
+  const scopedDraws=state.draws.filter(x=>slamKey(x)===key);
+  const slug=(d.slam+'-'+d.year).toLowerCase().replace(/[^a-z0-9]+/g,'-');
+  const payload={draws:scopedDraws,activeTab:0,_slamKey:key};
+  const b=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=slug+'.json';a.click();
+}
+
+// Merge loaded draws into current state by slam+draw type — replaces matching, adds new
+function mergeDraws(incoming){
+  incoming.forEach(d=>{
+    const idx=state.draws.findIndex(x=>x.slam===d.slam&&x.year===d.year&&x.draw===d.draw);
+    if(idx>=0)state.draws[idx]=d; // replace existing
+    else state.draws.push(d);     // add new
+  });
+  // Switch active tab to first draw of the loaded slam+year
+  if(incoming.length>0){
+    const key=slamKey(incoming[0]);
+    const idx=state.draws.findIndex(d=>slamKey(d)===key);
+    if(idx>=0)state.activeTab=idx;
+  }
 }
 
 function migrateState(s){
-  // Migrate old match fields to new model
   const draws=s.draws||[];
   draws.forEach(d=>{
     if(d.locked===undefined)d.locked=false;
@@ -745,7 +823,7 @@ function migrateState(s){
       if(m.originalPick===undefined)m.originalPick=null;
     }));
   });
-  return s;
+  return{...s,draws};
 }
 
 // ── PDF PARSER ──
@@ -798,34 +876,110 @@ function buildInitialRounds(r1m){
   return rounds;
 }
 
-// ── TABS ──
-function renderTabs(){
-  const bar=$('tabs-bar');bar.innerHTML='';
-  state.draws.forEach((d,i)=>{
-    const tab=document.createElement('button');
-    tab.className='tab'+(i===state.activeTab?' active':'');
-    const dot=document.createElement('span');dot.className='tab-dot';
-    const lbl=document.createElement('span');lbl.textContent=drawShortLabel(d);
-    const cls=document.createElement('button');cls.className='tab-close';cls.textContent='×';cls.title='Remove draw';
-    cls.addEventListener('click',e=>{e.stopPropagation();removeDrawTab(i);});
-    tab.appendChild(dot);tab.appendChild(lbl);tab.appendChild(cls);
-    tab.addEventListener('click',()=>switchTab(i));
-    bar.appendChild(tab);
-  });
-  const addBtn=document.createElement('button');
-  addBtn.className='tab-add';addBtn.textContent='+';addBtn.title='Add another draw';
-  addBtn.addEventListener('click',()=>{saveToStorage();showUploadScreen();});
-  bar.appendChild(addBtn);
+// ── SLAM / DRAW NAVIGATION ──
+// Groups draws by slam+year key
+function slamKey(d){return d.slam+'_'+d.year;}
+function slamLabel(d){const cfg=SLAM_CONFIG[d.slam]||{};return(cfg.name||d.slam)+' '+d.year;}
+function drawsForSlam(key){return state.draws.filter(d=>slamKey(d)===key);}
+function uniqueSlams(){const seen=new Set();return state.draws.filter(d=>{const k=slamKey(d);if(seen.has(k))return false;seen.add(k);return true;});}
+function activeSlamKey(){const d=activeDraw();return d?slamKey(d):null;}
+
+function renderHeader(){
+  const d=activeDraw();
+  // Slam dropdown label
+  const lbl=$('slam-dropdown-label');
+  if(lbl)lbl.textContent=d?slamLabel(d):'—';
+  // Segmented control: draws for active slam
+  const seg=$('seg-control');
+  if(seg){
+    seg.innerHTML='';
+    if(d){
+      const key=slamKey(d);
+      const slams=uniqueSlams();
+      // Only show seg if active slam has draws; also show all draw types
+      const DRAW_TYPES=['MS','WS'];
+      DRAW_TYPES.forEach(dt=>{
+        const btn=document.createElement('button');
+        btn.className='seg-btn';
+        btn.textContent=dt;
+        const match=state.draws.find(x=>slamKey(x)===key&&x.draw===dt);
+        if(!match){btn.disabled=true;}
+        else{
+          if(d.draw===dt)btn.classList.add('active');
+          btn.addEventListener('click',()=>{
+            const idx=state.draws.indexOf(match);
+            if(idx>=0)switchTab(idx);
+          });
+        }
+        seg.appendChild(btn);
+      });
+    }
+  }
+  updateLockBtn();
 }
+
+function renderSlamDropdown(){
+  const menu=$('slam-dropdown-menu');
+  const btn=$('slam-dropdown-btn');
+  if(!menu||!btn)return;
+  menu.innerHTML='';
+  const slams=uniqueSlams();
+  const activeKey=activeSlamKey();
+  slams.forEach(sd=>{
+    const key=slamKey(sd);
+    const item=document.createElement('div');
+    item.className='slam-dropdown-item'+(key===activeKey?' active':'');
+    const name=document.createElement('span');name.textContent=slamLabel(sd);
+    const del=document.createElement('button');
+    del.className='slam-dropdown-item-del';del.textContent='×';del.title='Remove all draws for this slam';
+    del.addEventListener('click',e=>{
+      e.stopPropagation();
+      const toRemove=state.draws.filter(d=>slamKey(d)===key);
+      toRemove.forEach(d=>{const i=state.draws.indexOf(d);if(i>=0)state.draws.splice(i,1);});
+      if(state.draws.length===0){saveToStorage();applyTheme('');closeSlamDropdown();showUploadScreen();return;}
+      state.activeTab=Math.min(state.activeTab,state.draws.length-1);
+      saveToStorage();closeSlamDropdown();switchTab(state.activeTab);
+    });
+    item.appendChild(name);item.appendChild(del);
+    item.addEventListener('click',()=>{
+      // Switch to first draw of this slam
+      const first=state.draws.findIndex(d=>slamKey(d)===key);
+      if(first>=0){closeSlamDropdown();switchTab(first);}
+    });
+    menu.appendChild(item);
+  });
+  // Add draw option at bottom
+  const addItem=document.createElement('div');
+  addItem.className='slam-dropdown-item';
+  addItem.style.cssText='border-top:1px solid var(--border);color:var(--text2)';
+  addItem.textContent='+ Add draw…';
+  addItem.addEventListener('click',()=>{closeSlamDropdown();saveToStorage();showUploadScreen();});
+  menu.appendChild(addItem);
+}
+
+function openSlamDropdown(){
+  renderSlamDropdown();
+  $('slam-dropdown-menu').classList.add('open');
+  $('slam-dropdown-btn').classList.add('open');
+}
+function closeSlamDropdown(){
+  $('slam-dropdown-menu').classList.remove('open');
+  $('slam-dropdown-btn').classList.remove('open');
+}
+
+$('slam-dropdown-btn').addEventListener('click',e=>{
+  e.stopPropagation();
+  const menu=$('slam-dropdown-menu');
+  if(menu.classList.contains('open'))closeSlamDropdown();
+  else openSlamDropdown();
+});
+document.addEventListener('click',()=>closeSlamDropdown());
 
 function switchTab(i){
   state.activeTab=i;
   const d=state.draws[i];
   applyTheme(d.slam);
-  const cfg=SLAM_CONFIG[d.slam]||{};
-  $('hdr-slam').textContent=(cfg.name||d.slam)+' '+d.year;
-  $('hdr-draw').textContent=d.draw+(cfg.surface?' · '+cfg.surface:'');
-  renderTabs();updateLockBtn();renderStats();renderBracket();
+  renderHeader();renderStats();renderBracket();
 }
 
 function removeDrawTab(i){
@@ -833,6 +987,120 @@ function removeDrawTab(i){
   if(state.draws.length===0){saveToStorage();applyTheme('');showUploadScreen();return;}
   state.activeTab=Math.min(state.activeTab,state.draws.length-1);
   saveToStorage();switchTab(state.activeTab);
+}
+
+// ── SEARCH ──
+function allMatchesForSearch(){
+  const results=[];
+  const activeKey=activeSlamKey();
+  state.draws.forEach((d,di)=>{
+    if(slamKey(d)!==activeKey)return; // only active slam+year
+    d.rounds.forEach((r,ri)=>{
+      r.matches.forEach((m,mi)=>{
+        [m.p1,m.p2].forEach(p=>{
+          if(p.name)results.push({drawIdx:di,ri,mi,m,p,round:r.label,draw:d});
+        });
+      });
+    });
+  });
+  return results;
+}
+
+function runSearch(q){
+  const res=$('search-results');
+  if(!q||q.length<2){res.classList.remove('open');return;}
+  const lower=q.toLowerCase();
+  const all=allMatchesForSearch();
+  const matched=all.filter(x=>x.p.name.toLowerCase().includes(lower));
+  // Deduplicate by draw+ri+mi (each match appears once per player, show once)
+  const seen=new Set();
+  const deduped=matched.filter(x=>{const k=x.drawIdx+'_'+x.ri+'_'+x.mi+'_'+x.p.name;if(seen.has(k))return false;seen.add(k);return true;});
+  if(deduped.length===0){
+    res.innerHTML='<div class="search-no-results">No players found</div>';
+    res.classList.add('open');return;
+  }
+  // Group by draw
+  const byDraw=new Map();
+  deduped.forEach(x=>{const k=x.drawIdx;if(!byDraw.has(k))byDraw.set(k,[]);byDraw.get(k).push(x);});
+  res.innerHTML='';
+  byDraw.forEach((items,di)=>{
+    const d=state.draws[di];
+    const grp=document.createElement('div');grp.className='search-group-label';
+    grp.textContent=slamLabel(d)+' · '+d.draw;
+    res.appendChild(grp);
+    items.forEach(x=>{
+      const item=document.createElement('div');item.className='search-result-item';
+      const opp=x.m.p1.name===x.p.name?x.m.p2:x.m.p1;
+      item.innerHTML=`<span class="search-result-round">${x.round}</span><span class="search-result-name">${x.p.name}</span><span class="search-result-vs">vs ${opp.name||'TBD'}</span>`;
+      item.addEventListener('click',()=>{
+        closeSearch();
+        if(x.drawIdx!==state.activeTab)switchTab(x.drawIdx);
+        // Scroll to card after render
+        setTimeout(()=>{
+          const cards=document.querySelectorAll('.mc');
+          // Find card by position — re-render has happened, scan for player name
+          const allPr=document.querySelectorAll('.pr-name');
+          for(const el of allPr){
+            if(el.textContent===x.p.name){
+              el.closest('.mc')?.scrollIntoView({behavior:'smooth',block:'center'});
+              const card=el.closest('.mc');
+              if(card){card.style.transition='box-shadow 0.2s';card.style.boxShadow='0 0 0 2px var(--accent)';setTimeout(()=>{card.style.boxShadow='';},1200);}
+              break;
+            }
+          }
+        },150);
+      });
+      res.appendChild(item);
+    });
+  });
+  res.classList.add('open');
+}
+
+function closeSearch(){
+  $('search-results').classList.remove('open');
+  $('search-input').value='';
+  $('search-clear').classList.remove('visible');
+}
+
+$('search-input').addEventListener('input',e=>{
+  const q=e.target.value.trim();
+  $('search-clear').classList.toggle('visible',q.length>0);
+  runSearch(q);
+});
+$('search-input').addEventListener('focus',e=>{if(e.target.value.trim().length>=2)runSearch(e.target.value.trim());});
+$('search-clear').addEventListener('click',closeSearch);
+document.addEventListener('click',e=>{if(!$('search-wrap').contains(e.target))$('search-results').classList.remove('open');});
+$('search-input').addEventListener('keydown',e=>{if(e.key==='Escape')closeSearch();});
+
+// ── CHALK SCORING ──
+function calcChalkScore(d){
+  let chalkBase=0,chalkSkill=0;
+  d.rounds.forEach((r,ri)=>{
+    const cfg=ROUND_CONFIG[ri]||ROUND_CONFIG[0];
+    r.matches.forEach(m=>{
+      if(!m.winner)return; // only completed matches
+      const ws=numericSeed(m.p1.seed),ls=numericSeed(m.p2.seed);
+      const p1Seeded=ws<=32,p2Seeded=ls<=32;
+      if(!p1Seeded&&!p2Seeded){
+        // Unseeded vs unseeded: chalk gets 50% expected value
+        chalkBase+=cfg.base*0.5;
+        chalkSkill+=(cfg.mult*5)*0.5;
+      } else {
+        // Chalk picks lower seed number (better seed), or seeded over unseeded
+        const chalkWinnerSeed=Math.min(ws,ls);
+        const chalkLoserSeed=Math.max(ws,ls);
+        const actualWinnerSeed=m.winner===m.p1.name?ws:ls;
+        if(actualWinnerSeed===chalkWinnerSeed){
+          // Chalk was right
+          chalkBase+=cfg.base;
+          // Chalk pick is always the favorite so upset value = 0
+          chalkSkill+=0;
+        }
+        // If chalk was wrong, scores 0
+      }
+    });
+  });
+  return{chalkBase:parseFloat(chalkBase.toFixed(1)),chalkSkill:parseFloat(chalkSkill.toFixed(1)),chalkTotal:parseFloat((chalkBase+chalkSkill).toFixed(1))};
 }
 
 // ── BRACKET RENDER ──
@@ -1129,10 +1397,7 @@ function showBracketScreen(){
   if(state.draws.length===0){showUploadScreen();return;}
   const d=activeDraw();
   applyTheme(d.slam);
-  const cfg=SLAM_CONFIG[d.slam]||{};
-  $('hdr-slam').textContent=(cfg.name||d.slam)+' '+d.year;
-  $('hdr-draw').textContent=d.draw+(cfg.surface?' · '+cfg.surface:'');
-  renderTabs();updateLockBtn();renderStats();renderBracket();showScreen('screen-bracket');
+  renderHeader();renderStats();renderBracket();showScreen('screen-bracket');
 }
 
 function checkReady(){$('parse-btn').disabled=!(pdfFile&&$('slam-select').value&&$('draw-select').value&&$('year-input').value);}
@@ -1169,16 +1434,20 @@ $('load-json-input').addEventListener('change',e=>{
   const r=new FileReader();
   r.onload=ev=>{
     try{
-      const loaded=JSON.parse(ev.target.result);
-      if(loaded.draws){state=migrateState(loaded);}
-      else if(loaded.rounds){state=migrateState({draws:[loaded],activeTab:0});}
-      else{alert('Unrecognised file format.');return;}
-      if(state.draws.length===0){showUploadScreen();return;}
-      state.activeTab=Math.min(state.activeTab||0,state.draws.length-1);
+      const raw=JSON.parse(ev.target.result);
+      let incoming=[];
+      if(raw.draws&&raw.draws.length){
+        const migrated=migrateState(raw);incoming=migrated.draws;
+      } else if(raw.rounds&&raw.rounds.length){
+        const migrated=migrateState({draws:[raw]});incoming=migrated.draws;
+      } else {alert('Unrecognised file format.');return;}
+      if(incoming.length===0){alert('No draws found in file.');return;}
+      mergeDraws(incoming);
       saveToStorage();showBracketScreen();
-    }catch{alert('Could not read bracket file.');}
+    }catch(e){alert('Could not read bracket file: '+e.message);}
   };
   r.readAsText(f);
+  e.target.value=''; // allow reloading same file
 });
 
 // ── PRINT ──
@@ -1192,107 +1461,158 @@ $('print-btn').onclick=()=>{
 
 function buildPrintHTML(d){
   const cfg=SLAM_CONFIG[d.slam]||{};
-  const titleStr=(cfg.name||d.slam)+' '+d.year+' — '+d.draw;
   const rounds=d.rounds;
   const r1=rounds[0].matches;
-  const total=r1.length,half=Math.ceil(total/2),q=Math.ceil(half/2);
-  const drawRounds=rounds.length-1;
+  const total=r1.length;
+  const half=Math.ceil(total/2);
+  const q=Math.ceil(half/2);
+  const drawRounds=rounds.length-1; // R1..SF, excludes Final
 
-  function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  const accentColors={AO:'#1048a0',RG:'#8b2615',WIM:'#1a5c2a',USO:'#1048a0'};
+  const accent=accentColors[d.slam]||'#1a1916';
+  function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-  function playerRowHTML(p,m){
+  // ── GEOMETRY ──
+  // Portrait A3: 297×420mm. Padding: 10mm top/sides, 8mm bottom.
+  // Header ~14mm, labels ~7mm → bracket body height ≈ 381mm
+  const BODY_H=381; // mm available for bracket body
+  const R1_PER_PAGE=32;
+  const PAIR_GAP=1.6; // mm gap between R1 match pairs
+
+  // One "unit" = height of one R1 match including trailing gap
+  const unit=(BODY_H-(R1_PER_PAGE-1)*PAIR_GAP)/(R1_PER_PAGE); // height of 2 rows
+  // But unit = 2*rowH, so:
+  const rowH=unit/2; // height per player row
+
+  // Slot height for round ri: spans 2^ri R1 rows + (2^ri - 1) gaps between pairs
+  // = 2^ri * rowH * 2 + (2^ri - 1) * PAIR_GAP
+  // Simplified: 2^ri * unit + (2^ri - 1) * PAIR_GAP
+  function slotH(ri){
+    const n=Math.pow(2,ri);
+    return n*unit+(n-1)*PAIR_GAP;
+  }
+
+  // Column widths mm — portrait 277mm usable
+  // No final column needed; SF gets bracket arm connecting to champion in header
+  const colW=[54,40,32,26,24,24]; // R1..SF (6 columns, drawRounds=6)
+  const gapW=3;
+
+  // ── NAME LINE ──
+  function nameLineHTML(p,m){
+    if(!p||!p.name) return '<div style="height:'+rowH.toFixed(2)+'mm"></div>';
     const isOrig=m.originalPick&&m.originalPick===p.name;
     const isPick=m.pick&&m.pick===p.name;
     const backup=isBackupPick(m);
     const isBackupRow=isPick&&backup;
-    const backupWrong=isBackupRow&&m.winner&&m.winner!==p.name;
-    const isElim=m.winner&&m.winner!==p.name&&p.name&&!isPick;
-    let bg='',nameStyle='',seedColor='#aaa';
-    if(isOrig&&m.result==='correct'){bg='#edf7ee';nameStyle='font-weight:700;color:#2d7a3a';seedColor='#2d7a3a';}
-    else if(isOrig&&m.result==='wrong'){bg='#fdf0ee';nameStyle='color:#c0392b;text-decoration:line-through;opacity:0.6';}
-    else if(isBackupRow&&backupWrong){bg='#f3edfb';nameStyle='color:#6b3fa0;text-decoration:line-through;opacity:0.6';seedColor='#6b3fa0';}
-    else if(isBackupRow){bg='#f3edfb';nameStyle='font-weight:700;color:#6b3fa0';seedColor='#6b3fa0';}
-    else if(isPick){bg='#edf2fb';nameStyle='font-weight:700;color:#1a5fb4';seedColor='#1a5fb4';}
-    else if(isElim){nameStyle='opacity:0.3';}
-    const name=p.name||'—';
-    return '<div style="display:flex;align-items:center;gap:3px;padding:1.5px 4px;min-height:12px;border-bottom:0.3pt solid #e8e8e8;background:'+bg+'">'
-      +'<span style="font-family:monospace;font-size:7pt;color:'+seedColor+';min-width:10px;text-align:center;flex-shrink:0">'+escH(p.seed||'')+'</span>'
-      +'<span style="flex:1;font-size:7.5pt;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'+nameStyle+'">'+escH(name)+'</span>'
+    const isElim=m.winner&&m.winner!==p.name;
+    const isCorrect=isOrig&&m.result==='correct';
+    const isWrong=isOrig&&m.result==='wrong';
+    const isBackupWrong=isBackupRow&&m.winner&&m.pick!==m.winner;
+
+    let ind='&nbsp;',nameStyle='color:#1a1916',seedCol='#bbb';
+    if(isCorrect){ind='✓';nameStyle='color:'+accent+';font-weight:700';seedCol=accent;}
+    else if(isWrong){ind='✗';nameStyle='color:#c0392b;text-decoration:line-through';seedCol='#c0392b';}
+    else if(isBackupRow&&!isBackupWrong){ind='·';nameStyle='color:#6b3fa0;font-style:italic';seedCol='#9b7bc0';}
+    else if(isBackupWrong){ind='·';nameStyle='color:#6b3fa0;font-style:italic;text-decoration:line-through';seedCol='#9b7bc0';}
+    else if(isPick||isOrig){ind='▸';nameStyle='font-weight:700';}
+    else if(isElim){nameStyle='color:#ccc';}
+
+    return '<div style="height:'+rowH.toFixed(2)+'mm;display:flex;align-items:center;overflow:hidden;gap:1pt">'
+      +'<span style="font-size:5pt;min-width:7pt;text-align:center;flex-shrink:0;color:'+accent+'">'+ind+'</span>'
+      +'<span style="font-family:monospace;font-size:5pt;color:'+seedCol+';min-width:9pt;text-align:right;flex-shrink:0">'+escH(p.seed)+'</span>'
+      +'<span style="font-family:\'Playfair Display\',Georgia,serif;font-size:7.5pt;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'+nameStyle+'">'+escH(p.name)+'</span>'
       +'</div>';
   }
 
-  function cardHTML(m){
-    const borderColor=m.result==='correct'?'#a8d4ae':m.result==='wrong'?'#f0b8b2':'#ccc';
-    return '<div style="border:0.5pt solid '+borderColor+';border-radius:2px;overflow:hidden;background:#fff;width:100%">'
-      +playerRowHTML(m.p1,m)+playerRowHTML(m.p2,m)
-      +(m.score?'<div style="font-family:monospace;font-size:5.5pt;color:#999;padding:1px 4px;background:#f9f9f9;border-top:0.3pt solid #eee">'+escH(m.score)+'</div>':'')
-      +'</div>';
-  }
+  // ── PAGE ──
+  function buildPage(startR1,endR1,pageNum,isTopHalf){
+    const r1Slice=r1.slice(startR1,endR1);
 
-  function halfHTML(startR1,endR1,showFinal){
-    const flex=[6,3.8,2.6,2,1.8,1.6];
-    let cols='';
-    for(let ri=0;ri<drawRounds;ri++){
-      const div=Math.pow(2,ri);
-      const slice=rounds[ri].matches.slice(Math.floor(startR1/div),Math.floor(endR1/div));
-      let slots='';
-      slice.forEach((m,localMi)=>{
-        const globalMi=Math.floor(startR1/div)+localMi;
-        if(ri===0&&localMi>0){
-          if(globalMi===q||(startR1>=half&&globalMi===half+q))
-            slots+='<div style="flex:0 0 4px;position:relative"><div style="position:absolute;left:0;right:0;top:50%;border-top:0.5pt dashed #bbb"></div></div>';
-        }
-        let arm='';
-        if(ri<drawRounds-1){
-          arm=localMi%2===0?'border-right:0.75pt solid #bbb;border-bottom:0.75pt solid #bbb;':'border-right:0.75pt solid #bbb;border-top:0.75pt solid #bbb;';
-        }
-        slots+='<div style="flex:1;min-height:0;display:flex;align-items:center;padding:1px 0;'+arm+'">'+cardHTML(m)+'</div>';
-      });
-      cols+='<div style="flex:'+flex[ri]+' 1 0;min-width:0;display:flex;flex-direction:column;height:100%;overflow:hidden">'+slots+'</div>';
-      if(ri<drawRounds-1)cols+='<div style="flex:0 0 3px;height:100%"></div>';
-    }
-    if(showFinal){
-      const finMatch=rounds[rounds.length-1].matches[0];
-      const champName=escH((finMatch&&(finMatch.winner||finMatch.pick))||'—');
-      cols+='<div style="flex:0 0 3px;display:flex;align-items:center"><div style="width:100%;border-top:0.75pt solid #bbb"></div></div>';
-      cols+='<div style="flex:0 0 28mm;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:4mm;padding-left:3px">'
-        +(finMatch?cardHTML(finMatch):'')
-        +'<div style="border:1.5pt solid #222;border-radius:3px;padding:4px 6px;text-align:center">'
-        +'<div style="font-family:monospace;font-size:6pt;text-transform:uppercase;letter-spacing:0.1em;color:#666;margin-bottom:3px">Champion</div>'
-        +'<div style="font-family:Georgia,serif;font-size:10pt;font-weight:600">'+champName+'</div>'
-        +'</div></div>';
-    }
-    return '<div style="display:flex;flex:1;width:100%;min-height:0;align-items:stretch">'+cols+'</div>';
-  }
+    // Champion (only on top half page)
+    const finMatch=rounds[rounds.length-1]&&rounds[rounds.length-1].matches[0];
+    const champName=finMatch&&(finMatch.winner||finMatch.pick)||'—';
 
-  function roundLabelsHTML(showFinal){
-    const flex=[6,3.8,2.6,2,1.8,1.6];
-    let html='<div style="display:flex;width:100%;margin-bottom:3px;flex-shrink:0">';
-    rounds.slice(0,drawRounds).forEach((r,ri)=>{
-      html+='<div style="flex:'+flex[ri]+' 1 0;text-align:center;font-family:monospace;font-size:6.5pt;text-transform:uppercase;letter-spacing:0.06em;color:#999;border-bottom:0.5pt solid #ccc;padding-bottom:2px">'+escH(r.label)+'</div>';
-      if(ri<drawRounds-1)html+='<div style="flex:0 0 3px"></div>';
-    });
-    if(showFinal){
-      html+='<div style="flex:0 0 3px"></div><div style="flex:0 0 28mm;text-align:center;font-family:monospace;font-size:6.5pt;text-transform:uppercase;letter-spacing:0.06em;color:#999;border-bottom:0.5pt solid #ccc;padding-bottom:2px">Final</div>';
-    }
-    return html+'</div>';
-  }
-
-  function pageHTML(startR1,endR1,pageLabel,showFinal){
-    return '<div style="width:408mm;height:282mm;overflow:hidden;display:flex;flex-direction:column;page-break-after:always;box-sizing:border-box;padding:0">'
-      +'<div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:0.75pt solid #888;padding-bottom:2px;margin-bottom:2px;flex-shrink:0">'
-      +'<span style="font-family:Georgia,serif;font-size:15pt;font-weight:600">'+escH(titleStr)+'</span>'
-      +'<span style="font-family:monospace;font-size:6pt;color:#666">'+escH(pageLabel)+'</span>'
+    // Header
+    const halfLabel=isTopHalf?'Top half':'Bottom half';
+    const champHTML=isTopHalf
+      ?'<span style="font-family:monospace;font-size:7pt;color:#888;margin-left:16pt">Champion: </span>'
+       +'<span style="font-family:\'Playfair Display\',Georgia,serif;font-size:10pt;font-weight:600;color:'+accent+'">'+escH(champName)+'</span>'
+      :'';
+    const header='<div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:1.5pt solid '+accent+';padding-bottom:3pt;margin-bottom:4pt;flex-shrink:0">'
+      +'<div>'
+        +'<span style="font-family:\'Playfair Display\',Georgia,serif;font-size:15pt;font-weight:600;color:'+accent+'">'+escH((cfg.name||d.slam)+' '+d.year)+'</span>'
+        +champHTML
       +'</div>'
-      +roundLabelsHTML(showFinal)+halfHTML(startR1,endR1,showFinal)+'</div>';
+      +'<span style="font-family:monospace;font-size:7pt;color:#888">'+escH(d.draw)+' · '+halfLabel+' · '+pageNum+' / 2</span>'
+      +'</div>';
+
+    // Round labels
+    let labels='<div style="display:flex;margin-bottom:2mm;flex-shrink:0;border-bottom:0.4pt solid #ddd;padding-bottom:2pt">';
+    for(let ri=0;ri<drawRounds;ri++){
+      if(ri>0) labels+='<div style="width:'+gapW+'mm;flex-shrink:0"></div>';
+      labels+='<div style="width:'+colW[ri]+'mm;flex-shrink:0;font-family:monospace;font-size:5.5pt;text-transform:uppercase;letter-spacing:0.1em;color:#999;text-align:center">'+escH(rounds[ri].label)+'</div>';
+    }
+    labels+='</div>';
+
+    // R1 column
+    function r1Col(){
+      let html='';
+      r1Slice.forEach((m,i)=>{
+        if(i>0){
+          const g=startR1+i;
+          const isQ=(g===q)||(g===half+q&&!isTopHalf);
+          html+=isQ
+            ?'<div style="height:'+(PAIR_GAP+1.5)+'mm;display:flex;align-items:center"><div style="flex:1;border-top:0.4pt dashed #c8c4bb"></div></div>'
+            :'<div style="height:'+PAIR_GAP+'mm"></div>';
+        }
+        html+=nameLineHTML(m.p1,m)+nameLineHTML(m.p2,m);
+      });
+      return html;
+    }
+
+    // Later round columns
+    function laterCol(ri){
+      const startMi=Math.floor(startR1/Math.pow(2,ri));
+      const endMi=Math.ceil(endR1/Math.pow(2,ri));
+      const slice=rounds[ri]?rounds[ri].matches.slice(startMi,endMi):[];
+      const sh=slotH(ri).toFixed(2);
+      const isLast=ri===drawRounds-1; // SF — last visible column
+      let html='';
+      slice.forEach((m,i)=>{
+        // Gap between slots equals PAIR_GAP (aligns with R1 gaps)
+        if(i>0) html+='<div style="height:'+PAIR_GAP+'mm"></div>';
+        // Bracket arm
+        const arm=isLast?'':(i%2===0
+          ?'border-right:0.5pt solid #ccc;border-bottom:0.5pt solid #ccc;'
+          :'border-right:0.5pt solid #ccc;border-top:0.5pt solid #ccc;');
+        html+='<div style="height:'+sh+'mm;'+arm+'display:flex;flex-direction:column;justify-content:center;padding-right:1pt">';
+        html+=nameLineHTML(m.p1,m)+nameLineHTML(m.p2,m);
+        html+='</div>';
+      });
+      return html;
+    }
+
+    // Bracket body
+    let body='<div style="display:flex;align-items:stretch;flex:1;min-height:0;overflow:hidden">';
+    for(let ri=0;ri<drawRounds;ri++){
+      if(ri>0) body+='<div style="width:'+gapW+'mm;flex-shrink:0"></div>';
+      const col=ri===0?r1Col():laterCol(ri);
+      const border=ri===0?'border-right:0.4pt solid #e0ddd8;':'';
+      body+='<div style="width:'+colW[ri]+'mm;flex-shrink:0;'+border+'">'+col+'</div>';
+    }
+    body+='</div>';
+
+    return '<div style="width:277mm;height:420mm;overflow:hidden;display:flex;flex-direction:column;page-break-after:always;box-sizing:border-box;padding:10mm 10mm 8mm;background:#fff">'
+      +header+labels+body+'</div>';
   }
 
-  return '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+escH(titleStr)+'</title>'
-    +'<style>@page{size:A3 landscape;margin:8mm}*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}body{background:#fff;font-family:Arial,sans-serif}'
-    +'@media screen{body{padding:10mm;background:#eee}div[style*="page-break"]{margin-bottom:10mm;box-shadow:0 2px 12px rgba(0,0,0,0.15);background:#fff}}'
+  const fonts='<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Mono&display=swap" rel="stylesheet">';
+  return '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+escH((cfg.name||d.slam)+' '+d.year+' '+d.draw)+'</title>'+fonts
+    +'<style>@page{size:A3 portrait;margin:0}*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}body{background:#f0eeea}'
+    +'@media screen{body{padding:8mm;display:flex;flex-direction:column;gap:8mm}div[style*="page-break"]{box-shadow:0 2px 16px rgba(0,0,0,0.15)}}'
     +'</style></head><body>'
-    +pageHTML(0,half,'Top half · Q1 & Q2 · page 1 of 2',true)
-    +pageHTML(half,total,'Bottom half · Q3 & Q4 · page 2 of 2',false)
+    +buildPage(0,half,1,true)
+    +buildPage(half,total,2,false)
     +'</body></html>';
 }
 
