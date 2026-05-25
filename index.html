@@ -1119,6 +1119,15 @@ $('search-input').addEventListener('focus',e=>{if(e.target.value.trim().length>=
 $('search-clear').addEventListener('click',closeSearch);
 document.addEventListener('click',e=>{if(!$('search-wrap').contains(e.target))$('search-results').classList.remove('open');});
 $('search-input').addEventListener('keydown',e=>{if(e.key==='Escape')closeSearch();});
+document.addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key==='f'){
+    const input=$('search-input');
+    if(input&&$('screen-bracket').classList.contains('active')){
+      e.preventDefault();
+      input.focus();input.select();
+    }
+  }
+});
 
 // ── CHALK SCORING ──
 function calcChalkScore(d){
