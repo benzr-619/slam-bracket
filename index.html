@@ -163,6 +163,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .mc{position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:6px;width:180px;display:flex;flex-direction:column;transition:border-color 0.12s}
 .mc.st-correct{border-color:var(--green-border)}
 .mc.st-wrong{border-color:var(--red-border)}
+.mc.st-needs-repick{border-color:#e8900a;border-width:2px}
 
 /* player row */
 .pr{display:flex;align-items:center;gap:5px;padding:4px 7px;cursor:pointer;transition:background 0.1s;border-bottom:1px solid var(--border);min-height:26px;user-select:none}
@@ -596,25 +597,27 @@ function placePickInNextRound(d,ri,mi){
 function handlePickClick(ri,mi,p){
   const d=activeDraw();if(!d)return;
   const m=d.rounds[ri].matches[mi];
-  // Pre-lock: can't pick in a match that already has a confirmed winner
-  if(!d.locked&&m.winner)return;
-  // Post-lock: can only pick in matches that have both players known (result not final)
-  if(d.locked&&m.winner)return;
-  // Post-lock: can't change an original pick match that's been resolved
-  if(d.locked&&m.result&&!isBackupPick(m))return;
+  if(m.winner)return;
+  if(d.locked&&m.result&&!isBackupPick(m)&&!m.editedAfterLock)return;
 
-  if(d.locked){
-    // Backup pick — just set m.pick, no cascade
+  const isWithdrawalRepick=d.locked&&m.editedAfterLock;
+
+  if(isWithdrawalRepick){
+    // Withdrawal replacement — re-snapshot originalPick and cascade like unlocked
+    m.pick=m.pick===p.name?null:p.name;
+    m.originalPick=m.pick;
+    if(m.pick){
+      m.editedAfterLock=false;
+      placePickAllRounds(d,ri,mi);
+    }
+  } else if(d.locked){
+    // Normal backup pick — no cascade
     m.pick=m.pick===p.name?null:p.name;
   } else {
-    // Original pick — set and cascade
+    // Unlocked original pick — cascade forward
     const prev=m.pick;
     m.pick=m.pick===p.name?null:p.name;
-    // Cascade: clear the old pick from next round if it was propagated there
-    if(prev&&prev!==m.pick){
-      clearPickForward(d,ri,mi,prev);
-    }
-    // Place new pick forward
+    if(prev&&prev!==m.pick)clearPickForward(d,ri,mi,prev);
     placePickAllRounds(d,ri,mi);
   }
   saveToStorage();renderStats();renderBracket();
@@ -752,9 +755,38 @@ function confirmEditPlayer(){
   const newSeed=$('epm-seed').value.trim();
   m[side]={name:newName,seed:newSeed};
   if(m.pick===oldName)m.pick=null;
-  if(oldName&&oldName!==newName)updatePlayerNameForward(d,ri,mi,oldName,newName,newSeed);
+  if(m.originalPick===oldName)m.originalPick=null;
+  if(oldName&&oldName!==newName){
+    if(d.locked){
+      // Withdrawal after lock — clear the whole chain and mark for re-picking
+      m.editedAfterLock=true;
+      withdrawalClearForward(d,ri,mi,oldName);
+    } else {
+      updatePlayerNameForward(d,ri,mi,oldName,newName,newSeed);
+    }
+  }
   closeModal();editCtx=null;
   saveToStorage();renderStats();renderBracket();
+}
+
+// Walk forward from ri,mi and clear any trace of withdrawnName —
+// slots, picks, originalPicks — marking each affected match for re-picking
+function withdrawalClearForward(d,ri,mi,withdrawnName){
+  let r=ri,m=mi;
+  while(true){
+    const next=getNextSlot(d,r,m);if(!next)break;
+    const nm=d.rounds[next.nri].matches[next.nmi];
+    let touched=false;
+    if(nm[next.side]?.name===withdrawnName){
+      nm[next.side]={name:'',seed:''};touched=true;
+    }
+    if(nm.pick===withdrawnName){nm.pick=null;touched=true;}
+    if(nm.originalPick===withdrawnName){nm.originalPick=null;touched=true;}
+    if(touched)nm.editedAfterLock=true;
+    // Keep walking only if the withdrawn player was in this slot
+    if(!touched)break;
+    r=next.nri;m=next.nmi;
+  }
 }
 
 function updatePlayerNameForward(d,ri,mi,oldName,newName,newSeed){
@@ -836,6 +868,7 @@ function migrateState(s){
       if(m.p2Backup!==undefined)delete m.p2Backup;
       if(m.watch!==undefined)delete m.watch;
       if(m.originalPick===undefined)m.originalPick=null;
+      if(m.editedAfterLock===undefined)m.editedAfterLock=false;
     }));
   });
   return{...s,draws};
@@ -1239,7 +1272,8 @@ function renderBracket(){
 function placeCard(d,m,ri,mi,x,y,wrap){
   // Card border reflects only original pick result
   let cardCls='mc';
-  if(m.result==='correct')cardCls+=' st-correct';
+  if(m.editedAfterLock)cardCls+=' st-needs-repick';
+  else if(m.result==='correct')cardCls+=' st-correct';
   else if(m.result==='wrong')cardCls+=' st-wrong';
 
   const card=document.createElement('div');
@@ -1276,7 +1310,7 @@ function placeCard(d,m,ri,mi,x,y,wrap){
     const dotEl=document.createElement('div');dotEl.className='pr-dot';
     row.appendChild(seedEl);row.appendChild(nameEl);row.appendChild(dotEl);
 
-    if(ri===0&&!d.locked){
+    if(ri===0){
       const editBtn=document.createElement('button');
       editBtn.className='pr-edit-btn';editBtn.textContent='✎';editBtn.title='Edit player';
       editBtn.addEventListener('click',e=>{e.stopPropagation();openEditPlayerModal(ri,mi,side);});
@@ -1285,7 +1319,7 @@ function placeCard(d,m,ri,mi,x,y,wrap){
 
     // Clickable: no winner yet, not a locked-and-resolved original pick
     const isResolved=cls.includes('locked');
-    if(p.name&&!m.winner&&!isResolved){
+    if(p.name&&!m.winner&&(!isResolved||m.editedAfterLock)){
       row.addEventListener('click',()=>handlePickClick(ri,mi,p));
     }
     return row;
