@@ -660,17 +660,28 @@ function clearPickForward(d,ri,mi,name){
 // ── APPLY WINNER (post-lock) ──
 function applyWinner(d,ri,mi,winnerName){
   const m=d.rounds[ri].matches[mi];
+  const loserName=m.p1.name===winnerName?m.p2.name:m.p1.name;
   m.winner=winnerName;
-  // Result is always judged against originalPick
   m.result=m.originalPick?(m.originalPick===winnerName?'correct':'wrong'):null;
-  // Place winner in next slot (this becomes a "known player" for backup picking)
+
+  // Place winner in next slot
   const next=getNextSlot(d,ri,mi);
   if(next){
     const nm=d.rounds[next.nri].matches[next.nmi];
     if(!nm.winner){
       nm[next.side]={name:winnerName,seed:findSeed(d,winnerName)};
+      // If this slot had a broken/eliminated player, clear the broken result
+      // so the match becomes fresh for picking
+      if(nm.result==='wrong'&&nm.originalPick&&nm.originalPick!==winnerName){
+        // Keep result=wrong (their original pick is still wrong) but clear the
+        // eliminated player from the slot — the wrong flag stays on the match
+      }
     }
   }
+
+  // Mark all downstream matches where loser was originalPick as wrong immediately
+  if(loserName)markLoserForward(d,ri,mi,loserName);
+
   // Update champion box
   const fin=d.rounds[d.rounds.length-1].matches[0];
   const cn=document.querySelector('.champ-name');
@@ -678,11 +689,33 @@ function applyWinner(d,ri,mi,winnerName){
   saveToStorage();renderStats();renderBracket();
 }
 
+// Walk forward and mark every match where loserName was originalPick as result='wrong'
+// Also mark the player slot as eliminated so it renders crossed out
+function markLoserForward(d,ri,mi,loserName){
+  let r=ri,m=mi;
+  while(true){
+    const next=getNextSlot(d,r,m);if(!next)break;
+    const nm=d.rounds[next.nri].matches[next.nmi];
+    if(nm.winner)break;
+    const side=next.side;
+    const slotName=nm[side]?.name;
+    // Mark the slot as eliminated (visual only — no stat impact)
+    if(slotName===loserName){
+      nm[side]={...nm[side],elim:true};
+    }
+    // Stop if the loser isn't in this slot
+    if(slotName!==loserName&&nm.originalPick!==loserName)break;
+    r=next.nri;m=next.nmi;
+  }
+}
+
 function undoWinner(d,ri,mi){
   const m=d.rounds[ri].matches[mi];
   const wasWinner=m.winner;
+  const wasLoser=m.p1.name===wasWinner?m.p2.name:m.p1.name;
   m.winner=null;m.result=null;
-  // Remove winner from next slot and restore the original pick if there was one
+
+  // Remove winner from next slot and restore original pick
   const next=getNextSlot(d,ri,mi);
   if(next&&wasWinner){
     const nm=d.rounds[next.nri].matches[next.nmi];
@@ -691,7 +724,27 @@ function undoWinner(d,ri,mi){
       nm[next.side]=origName?{name:origName,seed:findSeed(d,origName)}:{name:'',seed:''};
     }
   }
+
+  // Un-mark downstream matches that were marked wrong by this result
+  if(wasLoser)unmarkLoserForward(d,ri,mi,wasLoser);
+
   saveToStorage();renderStats();renderBracket();
+}
+
+function unmarkLoserForward(d,ri,mi,loserName){
+  let r=ri,m=mi;
+  while(true){
+    const next=getNextSlot(d,r,m);if(!next)break;
+    const nm=d.rounds[next.nri].matches[next.nmi];
+    if(nm.winner)break;
+    const side=next.side;
+    if(nm[side]?.elim&&nm[side].name===loserName){
+      const{elim,...rest}=nm[side];
+      nm[side]=rest; // remove elim flag, keep everything else
+    }
+    if(nm[side]?.name!==loserName&&nm.originalPick!==loserName)break;
+    r=next.nri;m=next.nmi;
+  }
 }
 
 // ── WINNER PICKER (when no pick set and ✓/✗ clicked) ──
@@ -1295,14 +1348,17 @@ function placeCard(d,m,ri,mi,x,y,wrap){
     const isBackup=isLivePick&&isBackupPick(m);
     const backupWrong=isBackup&&m.winner&&m.winner!==p.name;
     const isElim=m.winner&&m.winner!==p.name&&p.name&&!isLivePick;
+    const isBroken=p.elim&&!m.winner; // eliminated in earlier round, cascaded here
 
     let cls='pr';
     if(!p.name){
       cls+=' no-pick';
     } else if(isOrigPick&&m.result==='correct'){
       cls+=' s-orig-ok locked';
-    } else if(isOrigPick&&m.result==='wrong'){
+    } else if(isOrigPick&&m.result==='wrong'&&!isBroken){
       cls+=' s-orig-wrong locked';
+    } else if(isBroken){
+      cls+=' s-orig-wrong'; // eliminated in earlier round, definitively wrong
     } else if(isBackup&&backupWrong){
       cls+=' s-backup-wrong locked';
     } else if(isBackup){
