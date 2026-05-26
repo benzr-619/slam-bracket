@@ -166,9 +166,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 }
 
 /* ── HEADER ROW 2 (stats) ── */
-.hdr-row2{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:stretch;flex-shrink:0;height:56px;overflow:visible;position:relative;z-index:10}
-.stats-strip{display:flex;align-items:stretch;flex:1;overflow-x:auto;overflow-y:visible;gap:0;scrollbar-width:none;clip-path:none}
-.stats-strip::-webkit-scrollbar{display:none}
+.hdr-row2{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:stretch;flex-shrink:0;height:44px;overflow:visible;position:relative;z-index:10}
+.stats-strip{display:flex;align-items:stretch;gap:0}
 /* stat pills: top-anchored so all labels sit at same height */
 .stat-pill{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;padding:7px 16px 0;border-right:1px solid var(--border);height:100%;flex-shrink:0;position:relative;cursor:default;transition:background 0.1s;box-sizing:border-box}
 .stat-pill:hover{background:var(--surface2)}
@@ -176,24 +175,24 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .slbl{color:var(--accent);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.1em;white-space:nowrap;line-height:1;margin-bottom:3px}
 .sval{font-family:var(--mono);font-size:17px;font-weight:500;line-height:1}
 .vg{color:var(--green)}.vr{color:var(--red)}
-/* score pill value layout */
-.score-pill-inner{display:flex;flex-direction:column;gap:3px}
-.score-pill-top{display:flex;align-items:baseline;gap:9px}
+/* score pill — single row */
+.score-pill-row{display:flex;align-items:baseline;gap:6px;white-space:nowrap}
 .score-main{font-family:var(--mono);font-size:17px;font-weight:500;color:var(--text);line-height:1}
+.score-eq{font-family:var(--mono);font-size:11px;color:var(--text3);line-height:1}
+.score-base{font-family:var(--mono);font-size:13px;color:var(--text2);line-height:1}
+.score-lbl{font-family:var(--mono);font-size:9px;color:var(--text3);line-height:1}
+.score-plus{font-family:var(--mono);font-size:11px;color:var(--text3);line-height:1}
+.score-chalk-sep{font-family:var(--mono);font-size:11px;color:var(--border2);margin:0 2px;line-height:1}
 .score-chalk-num{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--text2);line-height:1}
 .score-chalk-lbl{font-family:var(--mono);font-size:9px;color:var(--text3);line-height:1}
-.score-chalk-sep{font-family:var(--mono);font-size:11px;color:var(--border2);margin:0 5px;line-height:1}
-.score-eq{font-family:var(--mono);font-size:13px;color:var(--text3);line-height:1;margin-right:3px}
-.score-sub-plus{font-family:var(--mono);font-size:9px;color:var(--text3);margin:0 3px}
-.score-pill-sub{font-family:var(--mono);font-size:9px;color:var(--text3);white-space:nowrap;line-height:1;padding-left:0;border-left:none;margin-top:1px}
 /* health bar */
 .health-val-row{display:flex;align-items:center;gap:7px}
 .health-bar-track{width:44px;height:5px;border-radius:3px;background:var(--surface3);overflow:hidden;flex-shrink:0}
 .health-bar-fill{height:100%;border-radius:3px;transition:width 0.3s,background 0.3s}
 .health-pct{font-family:var(--mono);font-size:17px;font-weight:500;white-space:nowrap;line-height:1}
-/* stat description bar — sits below row 2 */
-.stat-desc-bar{position:absolute;top:100%;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--border);padding:0 22px;max-height:0;overflow:hidden;display:flex;align-items:center;gap:10px;z-index:9;transition:max-height 0.15s}
-.stat-desc-bar.visible{max-height:64px;padding:6px 22px}
+/* stat description bar — flows below hdr-row2 */
+.stat-desc-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 22px;max-height:0;overflow:hidden;display:flex;align-items:center;gap:10px;z-index:9;transition:max-height 0.15s}
+.stat-desc-bar.visible{max-height:200px;padding:6px 22px}
 .stat-desc-label{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap;flex-shrink:0}
 .stat-desc-text{font-family:var(--sans);font-size:11px;color:var(--text2);white-space:normal;overflow:hidden}
 
@@ -365,10 +364,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
   <!-- ROW 2: stats -->
   <div class="hdr-row2">
     <div class="stats-strip" id="stats-strip"></div>
-    <div class="stat-desc-bar" id="stat-desc-bar">
-      <span class="stat-desc-label" id="stat-desc-label"></span>
-      <span class="stat-desc-text" id="stat-desc-text"></span>
-    </div>
+  </div>
+  <div class="stat-desc-bar" id="stat-desc-bar">
+    <span class="stat-desc-label" id="stat-desc-label"></span>
+    <span class="stat-desc-text" id="stat-desc-text"></span>
   </div>
   <div class="bracket-body" id="bracket-body"></div>
 </div>
@@ -595,23 +594,19 @@ function renderStats(){
   const totalScore=(s.baseScore+s.skillBonus).toFixed(1);
   const chalkDiff=chalk.chalkTotal>0?(s.baseScore+s.skillBonus-chalk.chalkTotal):null;
   const chalkHTML=chalkDiff!==null
-    ?`<span class="score-chalk-sep">|</span><span class="score-chalk-num">${chalkDiff>=0?'+':''}${chalkDiff.toFixed(1)}</span><span class="score-chalk-lbl"> vs chalk</span>`
+    ?`<span class="score-chalk-num">${chalkDiff>=0?'+':''}${chalkDiff.toFixed(1)}</span><span class="score-chalk-lbl"> vs chalk</span>`
     :'';
 
   const scorePill=document.createElement('div');scorePill.className='stat-pill';
   scorePill.innerHTML=`
     <span class="slbl">Score</span>
-    <div class="score-pill-inner">
-      <div class="score-pill-top">
-        <span class="score-main">${totalScore}</span>
-        ${chalkHTML}
-      </div>
-      <div class="score-pill-sub">
-        <span class="score-eq">=</span>
-        <span style="color:var(--text2)">${s.baseScore}</span><span> base</span>
-        <span class="score-sub-plus">+</span>
-        <span style="color:var(--text2)">${s.skillBonus.toFixed(1)}</span><span> upset</span>
-      </div>
+    <div class="score-pill-row">
+      <span class="score-main">${totalScore}</span>
+      <span class="score-eq">=</span>
+      <span class="score-base">${s.baseScore}</span><span class="score-lbl"> base</span>
+      <span class="score-plus">+</span>
+      <span class="score-base">${s.skillBonus.toFixed(1)}</span><span class="score-lbl"> upset</span>
+      ${chalkHTML?`<span class="score-chalk-sep">|</span>${chalkHTML}`:''}
     </div>`;
   attachTip(scorePill,'Score','Base points for each correct original pick, scaled by round, 1pt in R1 up to 20pts in the Final. Upset bonus rewards picking lower-seeded or unseeded players to win, scaled to how unlikely the upset was. Chalk shows what a basic seed-order bracket would score, unseeded vs. unseeded scored as a coin flip.');
   strip.appendChild(scorePill);
