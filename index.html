@@ -116,7 +116,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .seg-btn .seg-full{display:inline}
 .seg-btn .seg-short{display:none}
 /* search — narrows continuously before cascade fires */
-.hdr-center{flex:1;display:flex;align-items:center;justify-content:center;padding:0 8px;min-width:0;overflow:hidden}
+.hdr-center{flex:1;display:flex;align-items:center;justify-content:center;padding:0 8px;min-width:0;overflow:visible}
 .search-wrap{position:relative;display:flex;align-items:center;width:clamp(36px,calc(100vw - 600px),9999px)}
 .search-icon-btn{background:none;border:1px solid var(--border2);border-radius:6px;padding:5px 9px;cursor:pointer;color:var(--text3);font-size:14px;transition:all 0.15s;flex-shrink:0}
 .search-icon-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
@@ -126,7 +126,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .search-input-icon{position:absolute;left:9px;font-size:12px;color:var(--text3);pointer-events:none}
 .search-clear{position:absolute;right:8px;background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;padding:0;line-height:1;display:none}
 .search-clear.visible{display:block}
-.search-results{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);border:1px solid var(--border2);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);z-index:100;max-height:360px;overflow-y:auto;display:none}
+.search-results{position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);min-width:320px;width:max-content;max-width:480px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);z-index:100;max-height:360px;overflow-y:auto;display:none}
 .search-results.open{display:block}
 .search-group-label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);padding:8px 12px 4px;border-top:1px solid var(--border)}
 .search-group-label:first-child{border-top:none}
@@ -574,7 +574,7 @@ function renderStats(){
   d.rounds.forEach((r,ri)=>{if(r.matches.some(m=>m.winner))availableRounds.push({label:r.label,ri});});
   availableRounds.forEach(({label,ri})=>{
     const isActive=statsRoundFilter===ri;
-    const displayLabel=isActive&&ri!==null?'After '+label:label;
+    const displayLabel=ri===null?(isActive?'All Results':'All'):(isActive?'After '+label:label);
     const btn=document.createElement('button');
     btn.style.cssText='font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;border:1px solid '
       +(isActive?'var(--accent)':'var(--border2)')
