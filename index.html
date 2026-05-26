@@ -214,6 +214,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .pr:hover:not(.no-pick):not(.locked){background:var(--surface2)}
 /* original pick states */
 .pr.s-orig{background:var(--blue-bg)}
+.pr.s-orig-inactive{background:var(--blue-bg);opacity:0.45}
 .pr.s-orig-ok{background:var(--green-bg)}
 .pr.s-orig-wrong{background:var(--red-bg)}
 /* backup pick states — always purple, won or lost */
@@ -231,6 +232,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 /* seed/name colors by state */
 .pr.s-orig .pr-seed,.pr.s-orig .pr-name{color:var(--blue)}
 .pr.s-orig .pr-name{font-weight:600}
+.pr.s-orig-inactive .pr-seed,.pr.s-orig-inactive .pr-name{color:var(--blue)}
+.pr.s-orig-inactive .pr-name{font-weight:400}
+.pr.s-orig-inactive .pr-dot{background:var(--blue);border-color:var(--blue)}
 .pr.s-orig-ok .pr-seed,.pr.s-orig-ok .pr-name{color:var(--green)}
 .pr.s-orig-ok .pr-name{font-weight:600}
 .pr.s-orig-wrong .pr-name{color:var(--red)}
@@ -1517,7 +1521,9 @@ function placeCard(d,m,ri,mi,x,y,wrap){
     const isBackup=isLivePick&&isBackupPick(m);
     const backupWrong=isBackup&&m.winner&&m.winner!==p.name;
     const isElim=m.winner&&m.winner!==p.name&&p.name&&!isLivePick;
-    const isBroken=p.elim&&!m.winner; // eliminated in earlier round, cascaded here
+    const isBroken=p.elim&&!m.winner;
+    // Original pick is inactive if: locked, no result yet, original pick exists but no live pick set OR backup is active
+    const origInactive=d.locked&&!m.winner&&isOrigPick&&!isLivePick&&(m.originalPick&&(!m.pick||isBackupPick(m))); // eliminated in earlier round, cascaded here
 
     let cls='pr';
     if(!p.name){
@@ -1532,6 +1538,8 @@ function placeCard(d,m,ri,mi,x,y,wrap){
       cls+=' s-backup-wrong locked';
     } else if(isBackup){
       cls+=' s-backup';
+    } else if(origInactive){
+      cls+=' s-orig-inactive'; // original pick present but no active pick or backup is active
     } else if(isOrigPick||isLivePick){
       cls+=' s-orig'; // pending original pick (pre or post lock, no result yet)
     } else if(isElim){
