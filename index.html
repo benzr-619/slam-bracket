@@ -173,8 +173,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .stat-pill{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;padding:7px 16px 0;border-right:1px solid var(--border);height:100%;flex-shrink:0;position:relative;cursor:default;transition:background 0.1s;box-sizing:border-box}
 .stat-pill:hover{background:var(--surface2)}
 .stat-divider{width:1px;background:var(--border2);align-self:stretch;margin:8px 4px;flex-shrink:0}
-.slbl{color:var(--text2);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.1em;white-space:nowrap;line-height:1;margin-bottom:3px}
-.sval{font-family:var(--mono);font-size:15px;font-weight:500;line-height:1}
+.slbl{color:var(--accent);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.1em;white-space:nowrap;line-height:1;margin-bottom:3px}
+.sval{font-family:var(--mono);font-size:17px;font-weight:500;line-height:1}
 .vg{color:var(--green)}.vr{color:var(--red)}
 /* score pill value layout */
 .score-pill-inner{display:flex;flex-direction:column;gap:3px}
@@ -188,12 +188,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .health-val-row{display:flex;align-items:center;gap:7px}
 .health-bar-track{width:44px;height:5px;border-radius:3px;background:var(--surface3);overflow:hidden;flex-shrink:0}
 .health-bar-fill{height:100%;border-radius:3px;transition:width 0.3s,background 0.3s}
-.health-pct{font-family:var(--mono);font-size:15px;font-weight:500;white-space:nowrap;line-height:1}
+.health-pct{font-family:var(--mono);font-size:17px;font-weight:500;white-space:nowrap;line-height:1}
 /* stat description bar — sits below row 2 */
-.stat-desc-bar{position:absolute;top:100%;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--border);padding:0 22px;height:0;overflow:hidden;display:flex;align-items:center;gap:10px;z-index:9;transition:height 0.15s}
-.stat-desc-bar.visible{height:32px}
+.stat-desc-bar{position:absolute;top:100%;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--border);padding:0 22px;max-height:0;overflow:hidden;display:flex;align-items:center;gap:10px;z-index:9;transition:max-height 0.15s}
+.stat-desc-bar.visible{max-height:64px;padding:6px 22px}
 .stat-desc-label{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap;flex-shrink:0}
-.stat-desc-text{font-family:var(--sans);font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat-desc-text{font-family:var(--sans);font-size:11px;color:var(--text2);white-space:normal;overflow:hidden}
 
 /* ── BRACKET BODY ── */
 .bracket-body{flex:1;overflow:auto;padding:24px;background:var(--bg)}
@@ -472,7 +472,8 @@ function calcMatchScore(m,ri){
 function calcStatsAsOf(d, upToRi=null){
   const isLive=upToRi===null;
   const filterRi=isLive?Infinity:upToRi;
-  let filled=0,total=0,cOrig=0,wOrig=0,cBackup=0,wBackup=0,baseScore=0,skillBonus=0,intactPicks=0,pendingMatches=0;
+  let filled=0,total=0,cOrig=0,wOrig=0,cBackup=0,wBackup=0,baseScore=0,skillBonus=0;
+  let maxHealthPts=0,reachableHealthPts=0;
 
   // Build eliminated set from rounds 0..filterRi for snapshot integrity
   const eliminated=new Set();
@@ -509,18 +510,24 @@ function calcStatsAsOf(d, upToRi=null){
         else wBackup++;
       }
     } else if(isLive&&!m.winner){
-      // Live integrity: unconfirmed matches, use p.elim flags
-      pendingMatches++;
-      const pickSlot=m.originalPick===m.p1.name?m.p1:m.originalPick===m.p2.name?m.p2:null;
-      if(m.originalPick&&pickSlot&&!pickSlot.elim)intactPicks++;
+      // Live health: unplayed matches with an original pick
+      if(m.originalPick){
+        const pts=ROUND_CONFIG[ri]?ROUND_CONFIG[ri].base:0;
+        maxHealthPts+=pts;
+        const pickSlot=m.originalPick===m.p1.name?m.p1:m.originalPick===m.p2.name?m.p2:null;
+        if(pickSlot&&!pickSlot.elim)reachableHealthPts+=pts;
+      }
     } else if(!isLive&&ri>filterRi){
-      // Snapshot integrity: matches after the filter window, use eliminated set
-      pendingMatches++;
-      if(m.originalPick&&!eliminated.has(m.originalPick))intactPicks++;
+      // Snapshot health: matches after filter window
+      if(m.originalPick){
+        const pts=ROUND_CONFIG[ri]?ROUND_CONFIG[ri].base:0;
+        maxHealthPts+=pts;
+        if(!eliminated.has(m.originalPick))reachableHealthPts+=pts;
+      }
     }
   }));
 
-  return{filled,total,cOrig,wOrig,cBackup,wBackup,baseScore,skillBonus,intactPicks,pendingMatches};
+  return{filled,total,cOrig,wOrig,cBackup,wBackup,baseScore,skillBonus,maxHealthPts,reachableHealthPts};
 }
 
 // Keep calcStats as a convenience wrapper
@@ -605,24 +612,40 @@ function renderStats(){
   attachTip(scorePill,'Score','Points for correct pre-tournament picks. Each round is worth more: 1pt in R1 up to 7pts in the Final. Upset bonus adds extra points when you correctly predicted a lower-seeded player winning. Chalk score shows what a perfect seed-order bracket would have earned at this point.');
   strip.appendChild(scorePill);
 
-  // ── PREDICTED PILL ──
+  // ── DRAW ACCURACY PILL ──
   const origRes=s.cOrig+s.wOrig;
-  const predictedStr=origRes>0?`${s.cOrig} / ${origRes}`:'—';
-  simplePill('Predicted',predictedStr,'',
-    'How often your pre-tournament picks were right. Only counts matches where you had an original pick at lock, not backup picks made during the tournament.');
+  const drawAccPct=origRes>0?Math.round(s.cOrig/origRes*100):'—';
+  const drawAccFrac=origRes>0?`${s.cOrig} / ${origRes}`:'—';
+  const drawAccPill=document.createElement('div');drawAccPill.className='stat-pill';
+  drawAccPill.innerHTML=`
+    <span class="slbl">Draw Accuracy</span>
+    <div style="display:flex;align-items:baseline;gap:8px">
+      <span class="sval">${drawAccFrac}</span>
+      ${origRes>0?`<span class="score-chalk-num">${drawAccPct}%</span>`:''}
+    </div>`;
+  attachTip(drawAccPill,'Draw Accuracy','How often your pre-tournament picks were right. Only counts matches where you had an original pick at lock, not backup picks made during the tournament.');
+  strip.appendChild(drawAccPill);
 
-  // ── MATCH-BY-MATCH PILL ──
+  // ── MATCH ACCURACY PILL ──
   const allRes=s.cOrig+s.wOrig+s.cBackup+s.wBackup;
   const matchCorrect=s.cOrig+s.cBackup;
-  const matchStr=allRes>0?Math.round(matchCorrect/allRes*100)+'%':'—';
-  simplePill('Match-by-Match',matchStr,'',
-    'How often you picked the right winner match by match, including backup picks you made after your original pick was eliminated.');
+  const matchAccPct=allRes>0?Math.round(matchCorrect/allRes*100):'—';
+  const matchAccFrac=allRes>0?`${matchCorrect} / ${allRes}`:'—';
+  const matchAccPill=document.createElement('div');matchAccPill.className='stat-pill';
+  matchAccPill.innerHTML=`
+    <span class="slbl">Match Accuracy</span>
+    <div style="display:flex;align-items:baseline;gap:8px">
+      <span class="sval">${matchAccFrac}</span>
+      ${allRes>0?`<span class="score-chalk-num">${matchAccPct}%</span>`:''}
+    </div>`;
+  attachTip(matchAccPill,'Match Accuracy','How often you picked the right winner match by match, including backup picks you made after your original pick was eliminated.');
+  strip.appendChild(matchAccPill);
 
   // ── DRAW HEALTH PILL ──
   const healthPill=document.createElement('div');healthPill.className='stat-pill';
   healthPill.style.borderRight='none';
-  if(s.pendingMatches>0){
-    const pct=Math.round(s.intactPicks/s.pendingMatches*100);
+  if(s.maxHealthPts>0){
+    const pct=Math.round(s.reachableHealthPts/s.maxHealthPts*100);
     const barColor=pct>=70?'#2d7a3a':pct>=40?'#d4820a':'#c0392b';
     const textColor=pct>=70?'var(--green)':pct>=40?'#d4820a':'var(--red)';
     healthPill.innerHTML=`
@@ -631,12 +654,12 @@ function renderStats(){
         <div class="health-bar-track">
           <div class="health-bar-fill" style="width:${pct}%;background:${barColor}"></div>
         </div>
-        <span class="health-pct" style="color:${textColor}">${s.intactPicks}/${s.pendingMatches}</span>
+        <span class="health-pct" style="color:${textColor}">${pct}%</span>
       </div>`;
   } else {
     healthPill.innerHTML=`<span class="slbl">Draw Health</span><span class="sval" style="color:var(--text3)">—</span>`;
   }
-  attachTip(healthPill,'Draw Health','Of the matches still to be played, how many of your original picks are still alive to win them.');
+  attachTip(healthPill,'Draw Health','How much scoring upside your bracket still has going forward.');
   strip.appendChild(healthPill);
 
   // Keep desc bar hidden by default
