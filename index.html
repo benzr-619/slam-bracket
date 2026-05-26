@@ -182,8 +182,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .score-main{font-family:var(--mono);font-size:17px;font-weight:500;color:var(--text);line-height:1}
 .score-chalk-num{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--text2);line-height:1}
 .score-chalk-lbl{font-family:var(--mono);font-size:9px;color:var(--text3);line-height:1}
-.score-pill-sub{font-family:var(--mono);font-size:9px;color:var(--text3);white-space:nowrap;line-height:1;
-  padding-left:7px;border-left:2px solid var(--border2);margin-top:1px}
+.score-chalk-sep{font-family:var(--mono);font-size:11px;color:var(--border2);margin:0 5px;line-height:1}
+.score-eq{font-family:var(--mono);font-size:13px;color:var(--text3);line-height:1;margin-right:3px}
+.score-sub-plus{font-family:var(--mono);font-size:9px;color:var(--text3);margin:0 3px}
+.score-pill-sub{font-family:var(--mono);font-size:9px;color:var(--text3);white-space:nowrap;line-height:1;padding-left:0;border-left:none;margin-top:1px}
 /* health bar */
 .health-val-row{display:flex;align-items:center;gap:7px}
 .health-bar-track{width:44px;height:5px;border-radius:3px;background:var(--surface3);overflow:hidden;flex-shrink:0}
@@ -418,16 +420,19 @@ function isOrigPick(m){
 }
 
 // ── SCORING ──
-// Round config: base points + upset multiplier
+// Round config: base points only (upset bonus calculated separately via calcUpsetBonus)
 const ROUND_CONFIG=[
-  {base:1,mult:0.1},  // R1
-  {base:2,mult:0.2},  // R2
-  {base:3,mult:0.4},  // R3
-  {base:4,mult:0.6},  // R4
-  {base:5,mult:1.0},  // QF
-  {base:6,mult:1.5},  // SF
-  {base:7,mult:2.0},  // F
+  {base:1},   // R1  — ~80% predictable
+  {base:2},   // R2  — ~72% predictable
+  {base:3},   // R3  — ~65% predictable
+  {base:5},   // R4  — ~62% predictable
+  {base:8},   // QF  — ~58% predictable
+  {base:13},  // SF  — ~55% predictable
+  {base:20},  // F   — ~53% predictable
 ];
+
+// Upset bonus scaling constant — calibrated so unseeded beats [1] = 6.0 pts
+const UPSET_K = 6.0 / Math.log(33);
 
 // Returns numeric seed for scoring: 1-32 = seeded, 33 = unseeded/Q/WC/LL
 function numericSeed(seedStr){
@@ -435,28 +440,27 @@ function numericSeed(seedStr){
   return(n>=1&&n<=32)?n:33;
 }
 
-// Calculate upset value for a match given winner and loser seed strings
-function calcUpsetValue(winnerSeedStr,loserSeedStr){
+// Calculate upset bonus using log-ratio formula
+// Unseeded vs unseeded: flat 0.3 (below unseeded beats any seeded player)
+function calcUpsetBonus(winnerSeedStr, loserSeedStr){
   const ws=numericSeed(winnerSeedStr);
   const ls=numericSeed(loserSeedStr);
   const winnerSeeded=ws<=32;
   const loserSeeded=ls<=32;
 
-  let upsetVal=0;
-  if(winnerSeeded&&loserSeeded){
-    // Both seeded: upset only if winner seed number > loser seed number
-    upsetVal=ws>ls?ws-ls:0;
-  } else if(winnerSeeded&&!loserSeeded){
+  if(winnerSeeded && loserSeeded){
+    if(ws<=ls)return 0; // chalk or equal, no bonus
+    return parseFloat((Math.log(ws/ls)*UPSET_K).toFixed(2));
+  } else if(!winnerSeeded && loserSeeded){
+    // Unseeded beats seeded: log(33/ls) × k
+    return parseFloat((Math.log(33/ls)*UPSET_K).toFixed(2));
+  } else if(winnerSeeded && !loserSeeded){
     // Seeded beats unseeded: chalk, no bonus
-    upsetVal=0;
-  } else if(!winnerSeeded&&loserSeeded){
-    // Unseeded beats seeded: true upset, minimum 10 to always exceed unseeded vs unseeded
-    upsetVal=Math.max(33-ls,10);
+    return 0;
   } else {
-    // Unseeded vs unseeded: flat coin-flip bonus
-    upsetVal=5;
+    // Unseeded vs unseeded: flat engagement bonus
+    return 0.3;
   }
-  return upsetVal;
 }
 
 // Calculate score for one correct original pick
@@ -464,9 +468,8 @@ function calcMatchScore(m,ri){
   const cfg=ROUND_CONFIG[ri]||ROUND_CONFIG[0];
   const loser=m.winner===m.p1.name?m.p2:m.p1;
   const winner=m.winner===m.p1.name?m.p1:m.p2;
-  const upsetVal=calcUpsetValue(winner.seed,loser.seed);
-  const skillBonus=parseFloat((cfg.mult*upsetVal).toFixed(2));
-  return{base:cfg.base,skill:skillBonus};
+  const skillBonus=calcUpsetBonus(winner.seed, loser.seed);
+  return{base:cfg.base, skill:skillBonus};
 }
 
 function calcStatsAsOf(d, upToRi=null){
@@ -592,7 +595,7 @@ function renderStats(){
   const totalScore=(s.baseScore+s.skillBonus).toFixed(1);
   const chalkDiff=chalk.chalkTotal>0?(s.baseScore+s.skillBonus-chalk.chalkTotal):null;
   const chalkHTML=chalkDiff!==null
-    ?`<span class="score-chalk-num">${chalkDiff>=0?'+':''}${chalkDiff.toFixed(1)}</span><span class="score-chalk-lbl"> vs chalk</span>`
+    ?`<span class="score-chalk-sep">|</span><span class="score-chalk-num">${chalkDiff>=0?'+':''}${chalkDiff.toFixed(1)}</span><span class="score-chalk-lbl"> vs chalk</span>`
     :'';
 
   const scorePill=document.createElement('div');scorePill.className='stat-pill';
@@ -604,12 +607,13 @@ function renderStats(){
         ${chalkHTML}
       </div>
       <div class="score-pill-sub">
-        <span style="color:var(--text2)">${s.baseScore}</span> base
-        <span style="margin:0 4px;color:var(--border2)">·</span>
-        <span style="color:var(--text2)">+${s.skillBonus.toFixed(1)}</span> upset
+        <span class="score-eq">=</span>
+        <span style="color:var(--text2)">${s.baseScore}</span><span> base</span>
+        <span class="score-sub-plus">+</span>
+        <span style="color:var(--text2)">${s.skillBonus.toFixed(1)}</span><span> upset</span>
       </div>
     </div>`;
-  attachTip(scorePill,'Score','Points for correct pre-tournament picks. Each round is worth more: 1pt in R1 up to 7pts in the Final. Upset bonus adds extra points when you correctly predicted a lower-seeded player winning. Chalk score shows what a perfect seed-order bracket would have earned at this point.');
+  attachTip(scorePill,'Score','Base points for each correct original pick, scaled by round, 1pt in R1 up to 20pts in the Final. Upset bonus rewards picking lower-seeded or unseeded players to win, scaled to how unlikely the upset was. Chalk shows what a basic seed-order bracket would score, unseeded vs. unseeded scored as a coin flip.');
   strip.appendChild(scorePill);
 
   // ── DRAW ACCURACY PILL ──
@@ -623,7 +627,7 @@ function renderStats(){
       <span class="sval">${drawAccFrac}</span>
       ${origRes>0?`<span class="score-chalk-num">${drawAccPct}%</span>`:''}
     </div>`;
-  attachTip(drawAccPill,'Draw Accuracy','How often your pre-tournament picks were right. Only counts matches where you had an original pick at lock, not backup picks made during the tournament.');
+  attachTip(drawAccPill,'Draw Accuracy','How often your pre-tournament picks were right, evaluated when each match is confirmed. Original picks only.');
   strip.appendChild(drawAccPill);
 
   // ── MATCH ACCURACY PILL ──
@@ -638,7 +642,7 @@ function renderStats(){
       <span class="sval">${matchAccFrac}</span>
       ${allRes>0?`<span class="score-chalk-num">${matchAccPct}%</span>`:''}
     </div>`;
-  attachTip(matchAccPill,'Match Accuracy','How often you picked the right winner match by match, including backup picks you made after your original pick was eliminated.');
+  attachTip(matchAccPill,'Match Accuracy','How often you picked the right winner at match time, including any pick changes made during the tournament.');
   strip.appendChild(matchAccPill);
 
   // ── DRAW HEALTH PILL ──
@@ -646,8 +650,8 @@ function renderStats(){
   healthPill.style.borderRight='none';
   if(s.maxHealthPts>0){
     const pct=Math.round(s.reachableHealthPts/s.maxHealthPts*100);
-    const barColor=pct>=70?'#2d7a3a':pct>=40?'#d4820a':'#c0392b';
-    const textColor=pct>=70?'var(--green)':pct>=40?'#d4820a':'var(--red)';
+    const barColor=pct>=67?'#2d7a3a':pct>=33?'#d4820a':'#c0392b';
+    const textColor=pct>=67?'var(--green)':pct>=33?'#d4820a':'var(--red)';
     healthPill.innerHTML=`
       <span class="slbl">Draw Health</span>
       <div class="health-val-row">
@@ -659,7 +663,7 @@ function renderStats(){
   } else {
     healthPill.innerHTML=`<span class="slbl">Draw Health</span><span class="sval" style="color:var(--text3)">—</span>`;
   }
-  attachTip(healthPill,'Draw Health','How much scoring upside your bracket still has going forward.');
+  attachTip(healthPill,'Draw Health','Of the base points still available in unplayed matches, what percentage can you still earn. Reflects how intact or busted your draw is.');
   strip.appendChild(healthPill);
 
   // Keep desc bar hidden by default
@@ -1362,9 +1366,9 @@ function calcChalkScore(d){
       const ws=numericSeed(m.p1.seed),ls=numericSeed(m.p2.seed);
       const p1Seeded=ws<=32,p2Seeded=ls<=32;
       if(!p1Seeded&&!p2Seeded){
-        // Unseeded vs unseeded: chalk gets 50% expected value
+        // Unseeded vs unseeded: chalk gets 50% expected value of flat bonus
         chalkBase+=cfg.base*0.5;
-        chalkSkill+=(cfg.mult*5)*0.5;
+        chalkSkill+=0.3*0.5;
       } else {
         // Chalk picks lower seed number (better seed), or seeded over unseeded
         const chalkWinnerSeed=Math.min(ws,ls);
