@@ -132,6 +132,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .search-group-label:first-child{border-top:none}
 .search-result-item{display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;transition:background 0.1s}
 .search-result-item:hover{background:var(--surface2)}
+.search-result-item.kbd-focus{background:var(--accent-dim);outline:none}
 .search-result-round{font-family:var(--mono);font-size:9px;color:var(--text3);min-width:24px;flex-shrink:0}
 .search-result-name{font-size:12px;font-weight:500;flex:1}
 .search-result-vs{font-size:11px;color:var(--text2)}
@@ -346,7 +347,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
       <div class="search-wrap" id="search-wrap">
         <div class="search-input-wrap">
           <span class="search-input-icon">🔍</span>
-          <input class="search-input" id="search-input" type="text" placeholder="Search players…" autocomplete="off">
+          <input class="search-input" id="search-input" type="text" placeholder="Search players…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           <button class="search-clear" id="search-clear">×</button>
         </div>
         <div class="search-results" id="search-results"></div>
@@ -1344,7 +1345,34 @@ $('search-input').addEventListener('input',e=>{
 $('search-input').addEventListener('focus',e=>{if(e.target.value.trim().length>=2)runSearch(e.target.value.trim());});
 $('search-clear').addEventListener('click',closeSearch);
 document.addEventListener('click',e=>{if(!$('search-wrap').contains(e.target))$('search-results').classList.remove('open');});
-$('search-input').addEventListener('keydown',e=>{if(e.key==='Escape')closeSearch();});
+$('search-input').addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeSearch();return;}
+  const res=$('search-results');
+  if(!res.classList.contains('open'))return;
+  const items=res.querySelectorAll('.search-result-item');
+  if(!items.length)return;
+  const focused=res.querySelector('.search-result-item.kbd-focus');
+  const idx=focused?Array.from(items).indexOf(focused):-1;
+  if(e.key==='ArrowDown'){
+    e.preventDefault();
+    const next=idx<items.length-1?idx+1:0;
+    items.forEach(i=>i.classList.remove('kbd-focus'));
+    items[next].classList.add('kbd-focus');
+    items[next].scrollIntoView({block:'nearest'});
+  } else if(e.key==='ArrowUp'){
+    e.preventDefault();
+    if(idx<=0){
+      items.forEach(i=>i.classList.remove('kbd-focus'));
+      return; // back to input, no item focused
+    }
+    items.forEach(i=>i.classList.remove('kbd-focus'));
+    items[idx-1].classList.add('kbd-focus');
+    items[idx-1].scrollIntoView({block:'nearest'});
+  } else if(e.key==='Enter'){
+    e.preventDefault();
+    if(focused)focused.click();
+  }
+});
 document.addEventListener('keydown',e=>{
   if((e.metaKey||e.ctrlKey)&&e.key==='f'){
     const input=$('search-input');
