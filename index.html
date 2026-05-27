@@ -194,6 +194,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 /* stat description bar — flows below hdr-row2 */
 .stat-desc-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 22px;max-height:0;overflow:hidden;display:flex;align-items:center;gap:10px;z-index:9;transition:max-height 0.15s}
 .stat-desc-bar.visible{max-height:200px;padding:6px 22px}
+/* round labels bar — sticky header row below stats */
+.round-labels-bar{background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0;overflow:hidden;height:26px;display:flex;align-items:center;z-index:8}
+.round-labels-inner{display:flex;align-items:center;padding-left:24px;min-width:max-content;will-change:transform}
 .stat-desc-label{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap;flex-shrink:0}
 .stat-desc-text{font-family:var(--sans);font-size:11px;color:var(--text2);white-space:normal;overflow:hidden}
 
@@ -376,6 +379,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
   <div class="stat-desc-bar" id="stat-desc-bar">
     <span class="stat-desc-label" id="stat-desc-label"></span>
     <span class="stat-desc-text" id="stat-desc-text"></span>
+  </div>
+  <div class="round-labels-bar" id="round-labels-bar">
+    <div class="round-labels-inner" id="round-labels-inner"></div>
   </div>
   <div class="bracket-body" id="bracket-body"></div>
 </div>
@@ -1513,21 +1519,23 @@ function renderBracket(){
   champDiv.appendChild(champLbl);champDiv.appendChild(champNm);wrap.appendChild(champDiv);
   addLine(finX+CW,finCY,champX,finCY);
 
-  // Round labels
-  const lblRow=document.createElement('div');
-  lblRow.style.cssText='display:flex;align-items:center;padding-bottom:10px;min-width:max-content';
+  // Round labels — populate sticky header bar
+  const labelsInner=$('round-labels-inner');
+  labelsInner.innerHTML='';
   for(let ri=0;ri<drawRounds;ri++){
     const l=document.createElement('div');
     l.style.cssText='width:180px;flex-shrink:0;text-align:center;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3)';
-    l.textContent=rounds[ri].label;lblRow.appendChild(l);
-    if(ri<drawRounds-1){const g=document.createElement('div');g.style.cssText='width:20px;flex-shrink:0';lblRow.appendChild(g);}
+    l.textContent=rounds[ri].label;labelsInner.appendChild(l);
+    if(ri<drawRounds-1){const g=document.createElement('div');g.style.cssText='width:20px;flex-shrink:0';labelsInner.appendChild(g);}
   }
   const finLbl=document.createElement('div');
   finLbl.style.cssText='width:180px;flex-shrink:0;text-align:center;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);padding-left:20px';
-  finLbl.textContent='Final';lblRow.appendChild(finLbl);
+  finLbl.textContent='Final';labelsInner.appendChild(finLbl);
+  // Reset scroll sync on re-render
+  labelsInner.style.transform='translateX(0)';
 
   const outer=document.createElement('div');outer.style.cssText='display:inline-block';
-  outer.appendChild(lblRow);wrap.appendChild(svg);outer.appendChild(wrap);body.appendChild(outer);
+  wrap.appendChild(svg);outer.appendChild(wrap);body.appendChild(outer);
 }
 
 function placeCard(d,m,ri,mi,x,y,wrap){
@@ -1951,6 +1959,12 @@ function buildPrintHTML(d){
     +buildPage(half,total,2,false)
     +'</body></html>';
 }
+
+// ── ROUND LABELS SCROLL SYNC ──
+document.addEventListener('DOMContentLoaded',()=>{
+  const bb=$('bracket-body'),li=$('round-labels-inner');
+  if(bb&&li){bb.addEventListener('scroll',function(){li.style.transform='translateX(-'+this.scrollLeft+'px)';});}
+});
 
 // ── INIT ──
 window.addEventListener('load',()=>{
