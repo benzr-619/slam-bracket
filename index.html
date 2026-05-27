@@ -229,6 +229,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .pr-seed{font-family:var(--mono);font-size:9px;color:var(--text3);min-width:16px;text-align:center;flex-shrink:0}
 .pr-name{flex:1;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
 .pr-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;background:transparent;border:1px solid var(--border2)}
+.pr-star{background:none;border:none;cursor:pointer;font-size:13px;flex-shrink:0;padding:0 3px;line-height:1;color:var(--border2);transition:color 0.12s}
+.pr-star:hover{color:#c9a227}
+.pr-star.is-high{color:#c9a227}
 
 /* seed/name colors by state */
 .pr.s-orig .pr-seed,.pr.s-orig .pr-name{color:var(--blue)}
@@ -251,7 +254,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .pr.s-backup .pr-dot{background:var(--purple);border-color:var(--purple)}
 .pr.s-backup-wrong .pr-dot{background:var(--purple);border-color:var(--purple)}
 
-.pr-edit-btn{display:none;position:absolute;right:18px;top:50%;transform:translateY(-50%);background:var(--surface2);border:1px solid var(--border);color:var(--text3);padding:1px 5px;border-radius:3px;font-size:9px;cursor:pointer;line-height:1.4;z-index:2}
+.pr-edit-btn{display:none;position:absolute;right:30px;top:50%;transform:translateY(-50%);background:var(--surface2);border:1px solid var(--border);color:var(--text3);padding:1px 5px;border-radius:3px;font-size:9px;cursor:pointer;line-height:1.4;z-index:2}
 .pr:hover .pr-edit-btn{display:block}
 .pr-edit-btn:hover{color:var(--accent);border-color:var(--accent)}
 
@@ -424,19 +427,8 @@ function isOrigPick(m){
 }
 
 // ── SCORING ──
-// Round config: base points only (upset bonus calculated separately via calcUpsetBonus)
-const ROUND_CONFIG=[
-  {base:1},   // R1  — ~80% predictable
-  {base:2},   // R2  — ~72% predictable
-  {base:3},   // R3  — ~65% predictable
-  {base:5},   // R4  — ~62% predictable
-  {base:8},   // QF  — ~58% predictable
-  {base:13},  // SF  — ~55% predictable
-  {base:20},  // F   — ~53% predictable
-];
-
-// Upset bonus scaling constant — calibrated so unseeded beats [1] = 6.0 pts
-const UPSET_K = 6.0 / Math.log(33);
+// Round config: base points = round(1.78^(r-1)), r=1..7
+const ROUND_CONFIG = Array.from({length:7},(_,i)=>({base:Math.round(Math.pow(1.78,i))}));
 
 // Returns numeric seed for scoring: 1-32 = seeded, 33 = unseeded/Q/WC/LL
 function numericSeed(seedStr){
@@ -444,27 +436,13 @@ function numericSeed(seedStr){
   return(n>=1&&n<=32)?n:33;
 }
 
-// Calculate upset bonus using log-ratio formula
-// Unseeded vs unseeded: flat 0.3 (below unseeded beats any seeded player)
+// Upset bonus = winner seed − loser seed (floor 0)
+// Unseeded vs unseeded: flat 0.5
 function calcUpsetBonus(winnerSeedStr, loserSeedStr){
   const ws=numericSeed(winnerSeedStr);
   const ls=numericSeed(loserSeedStr);
-  const winnerSeeded=ws<=32;
-  const loserSeeded=ls<=32;
-
-  if(winnerSeeded && loserSeeded){
-    if(ws<=ls)return 0; // chalk or equal, no bonus
-    return parseFloat((Math.log(ws/ls)*UPSET_K).toFixed(2));
-  } else if(!winnerSeeded && loserSeeded){
-    // Unseeded beats seeded: log(33/ls) × k
-    return parseFloat((Math.log(33/ls)*UPSET_K).toFixed(2));
-  } else if(winnerSeeded && !loserSeeded){
-    // Seeded beats unseeded: chalk, no bonus
-    return 0;
-  } else {
-    // Unseeded vs unseeded: flat engagement bonus
-    return 0.3;
-  }
+  if(ws===33 && ls===33) return 0.5; // unseeded vs unseeded
+  return Math.max(0, ws - ls);
 }
 
 // Calculate score for one correct original pick
@@ -480,6 +458,7 @@ function calcStatsAsOf(d, upToRi=null){
   const isLive=upToRi===null;
   const filterRi=isLive?Infinity:upToRi;
   let filled=0,total=0,cOrig=0,wOrig=0,cBackup=0,wBackup=0,baseScore=0,skillBonus=0;
+  let cDrawOrig=0,wDrawOrig=0; // original pick result for ALL confirmed matches (incl. backup)
   let maxHealthPts=0,reachableHealthPts=0;
 
   // Build eliminated set from rounds 0..filterRi for snapshot integrity
@@ -503,6 +482,9 @@ function calcStatsAsOf(d, upToRi=null){
     if(ri<=filterRi&&m.winner){
       // Confirmed match in window — scoring/accuracy
       const backup=isBackupPick(m);
+      // Draw accuracy always tracks original pick result, backup or not
+      if(m.result==='correct')cDrawOrig++;
+      else if(m.result==='wrong')wDrawOrig++;
       if(!backup){
         if(m.result==='correct'){
           cOrig++;
@@ -516,25 +498,40 @@ function calcStatsAsOf(d, upToRi=null){
         if(m.pick===m.winner)cBackup++;
         else wBackup++;
       }
-    } else if(isLive&&!m.winner){
-      // Live health: unplayed matches with an original pick
-      if(m.originalPick){
-        const pts=ROUND_CONFIG[ri]?ROUND_CONFIG[ri].base:0;
-        maxHealthPts+=pts;
-        const pickSlot=m.originalPick===m.p1.name?m.p1:m.originalPick===m.p2.name?m.p2:null;
-        if(pickSlot&&!pickSlot.elim)reachableHealthPts+=pts;
-      }
-    } else if(!isLive&&ri>filterRi){
-      // Snapshot health: matches after filter window
-      if(m.originalPick){
-        const pts=ROUND_CONFIG[ri]?ROUND_CONFIG[ri].base:0;
-        maxHealthPts+=pts;
-        if(!eliminated.has(m.originalPick))reachableHealthPts+=pts;
+    }
+
+    // ── DRAW HEALTH (unified, fixed denominator) ──
+    // Denominator: all rounds with an original pick.
+    // Numerator: pts already won + pts still winnable.
+    // Drains as picks are eliminated; advances in filter = more eliminations counted.
+    if(m.originalPick){
+      const pts=ROUND_CONFIG[ri]?ROUND_CONFIG[ri].base:0;
+      maxHealthPts+=pts;
+      if(isLive){
+        // Live: won matches count; unplayed matches count if pick isn't eliminated
+        if(m.winner){
+          if(m.winner===m.originalPick)reachableHealthPts+=pts;
+          // else: pick lost this match — zero contribution
+        } else {
+          // Unplayed: check if original pick player is still alive in this slot
+          const pickSlot=m.originalPick===m.p1.name?m.p1:m.originalPick===m.p2.name?m.p2:null;
+          if(pickSlot&&!pickSlot.elim)reachableHealthPts+=pts;
+        }
+      } else {
+        // Snapshot (after Ri): confirmed in-window wins count; everything after
+        // window counts if pick survived through filterRi
+        if(ri<=filterRi&&m.winner){
+          if(m.winner===m.originalPick)reachableHealthPts+=pts;
+          // else: pick lost in-window — zero contribution
+        } else {
+          // Unplayed in-window OR any round after window: attainable if not yet eliminated
+          if(!eliminated.has(m.originalPick))reachableHealthPts+=pts;
+        }
       }
     }
   }));
 
-  return{filled,total,cOrig,wOrig,cBackup,wBackup,baseScore,skillBonus,maxHealthPts,reachableHealthPts};
+  return{filled,total,cOrig,wOrig,cDrawOrig,wDrawOrig,cBackup,wBackup,baseScore,skillBonus,maxHealthPts,reachableHealthPts};
 }
 
 // Keep calcStats as a convenience wrapper
@@ -578,7 +575,7 @@ function renderStats(){
   const selWrap=document.createElement('div');
   selWrap.style.cssText='display:flex;align-items:center;gap:3px;padding:0 10px 0 14px;border-right:1px solid var(--border);height:100%;flex-shrink:0';
   const availableRounds=[{label:'All Results',ri:null}];
-  d.rounds.forEach((r,ri)=>{if(r.matches.some(m=>m.winner))availableRounds.push({label:r.label,ri});});
+  d.rounds.forEach((r,ri)=>{if(r.matches.every(m=>m.winner))availableRounds.push({label:r.label,ri});});
   availableRounds.forEach(({label,ri})=>{
     const isActive=statsRoundFilter===ri;
     const displayLabel=ri===null?(isActive?'All Results':'All'):(isActive?'After '+label:label);
@@ -596,10 +593,10 @@ function renderStats(){
 
   // ── SCORE PILL ──
   const chalk=calcChalkScore(d);
-  const totalScore=(s.baseScore+s.skillBonus).toFixed(1);
+  const totalScore=Math.round(s.baseScore+s.skillBonus);
   const chalkDiff=chalk.chalkTotal>0?(s.baseScore+s.skillBonus-chalk.chalkTotal):null;
   const chalkHTML=chalkDiff!==null
-    ?`<span class="score-chalk-num">${chalkDiff>=0?'+':''}${chalkDiff.toFixed(1)}</span><span class="score-chalk-lbl"> vs chalk</span>`
+    ?`<span class="score-chalk-num">${chalkDiff>=0?'+':''}${Math.round(chalkDiff)}</span><span class="score-chalk-lbl"> vs chalk</span>`
     :'';
 
   const scorePill=document.createElement('div');scorePill.className='stat-pill';
@@ -610,16 +607,17 @@ function renderStats(){
       <span class="score-eq">=</span>
       <span class="score-base">${s.baseScore}</span><span class="score-lbl"> base</span>
       <span class="score-plus">+</span>
-      <span class="score-base">${s.skillBonus.toFixed(1)}</span><span class="score-lbl"> upset</span>
+      <span class="score-base">${Math.round(s.skillBonus)}</span><span class="score-lbl"> upset</span>
       ${chalkHTML?`<span class="score-chalk-sep">|</span>${chalkHTML}`:''}
     </div>`;
-  attachTip(scorePill,'Score','Base points for each correct original pick, scaled by round, 1pt in R1 up to 20pts in the Final. Upset bonus rewards picking lower-seeded or unseeded players to win, scaled to how unlikely the upset was. Chalk shows what a basic seed-order bracket would score, unseeded vs. unseeded scored as a coin flip.');
+  attachTip(scorePill,'Score','Base points for each correct original pick: 1, 2, 3, 6, 10, 18, 32 (R1→F). Upset bonus = winner seed minus loser seed — unseeded counts as 33, floored at 0. Unseeded vs. unseeded is a flat 0.5. Chalk shows what a seed-order bracket would score.');
   strip.appendChild(scorePill);
 
   // ── DRAW ACCURACY PILL ──
-  const origRes=s.cOrig+s.wOrig;
-  const drawAccPct=origRes>0?Math.round(s.cOrig/origRes*100):'—';
-  const drawAccFrac=origRes>0?`${s.cOrig} / ${origRes}`:'—';
+  // Uses cDrawOrig/wDrawOrig which cover ALL confirmed matches (incl. voluntary backup swaps)
+  const origRes=s.cDrawOrig+s.wDrawOrig;
+  const drawAccPct=origRes>0?Math.round(s.cDrawOrig/origRes*100):'—';
+  const drawAccFrac=origRes>0?`${s.cDrawOrig} / ${origRes}`:'—';
   const drawAccPill=document.createElement('div');drawAccPill.className='stat-pill';
   drawAccPill.innerHTML=`
     <span class="slbl">Draw Accuracy</span>
@@ -663,7 +661,7 @@ function renderStats(){
   } else {
     healthPill.innerHTML=`<span class="slbl">Draw Health</span><span class="sval" style="color:var(--text3)">—</span>`;
   }
-  attachTip(healthPill,'Draw Health','Of the base points still available in unplayed matches, what percentage can you still earn. Reflects how intact or busted your draw is.');
+  attachTip(healthPill,'Draw Health','How much of your draw\'s scoring potential is still alive? The lower it gets, the more busted your bracket.');
   strip.appendChild(healthPill);
 
   // Keep desc bar hidden by default
@@ -1578,7 +1576,25 @@ function placeCard(d,m,ri,mi,x,y,wrap){
     const seedEl=document.createElement('span');seedEl.className='pr-seed';seedEl.textContent=p.seed||'';
     const nameEl=document.createElement('span');nameEl.className='pr-name';nameEl.textContent=p.name||'—';
     const dotEl=document.createElement('div');dotEl.className='pr-dot';
-    row.appendChild(seedEl);row.appendChild(nameEl);row.appendChild(dotEl);
+    row.appendChild(seedEl);row.appendChild(nameEl);
+    // Star: high-confidence toggle — only on active pick row of a match where both players
+    // are confirmed (R1: both named in draw; R2+: both feeder matches have a winner)
+    const bothConfirmed=ri===0
+      ?(m.p1.name&&m.p2.name)
+      :(d.rounds[ri-1]?.matches[mi*2]?.winner&&d.rounds[ri-1]?.matches[mi*2+1]?.winner);
+    if(isLivePick&&bothConfirmed&&!m.winner){
+      const starEl=document.createElement('button');
+      starEl.className='pr-star'+(m.highConfidence?' is-high':'');
+      starEl.textContent=m.highConfidence?'★':'☆';
+      starEl.title=m.highConfidence?'High confidence (click to clear)':'Mark as high confidence';
+      starEl.addEventListener('click',e=>{
+        e.stopPropagation();
+        m.highConfidence=!m.highConfidence;
+        saveToStorage();renderStats();renderBracket();
+      });
+      row.appendChild(starEl);
+    }
+    row.appendChild(dotEl);
 
     if(ri===0){
       const editBtn=document.createElement('button');
