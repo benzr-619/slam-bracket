@@ -191,8 +191,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .health-bar-track{width:44px;height:5px;border-radius:3px;background:var(--surface3);overflow:hidden;flex-shrink:0}
 .health-bar-fill{height:100%;border-radius:3px;transition:width 0.3s,background 0.3s}
 .health-pct{font-family:var(--mono);font-size:17px;font-weight:500;white-space:nowrap;line-height:1}
-/* stat description bar — flows below hdr-row2 */
-.stat-desc-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 22px;max-height:0;overflow:hidden;display:flex;align-items:center;gap:10px;z-index:9;transition:max-height 0.15s}
+/* stat description bar — overlays below hdr-row2 */
+.stat-desc-bar{position:absolute;top:100%;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--border);padding:0 22px;max-height:0;overflow:hidden;display:flex;align-items:center;gap:10px;transition:max-height 0.15s,padding 0.15s}
 .stat-desc-bar.visible{max-height:200px;padding:6px 22px}
 /* round labels bar — sticky header row below stats */
 .round-labels-bar{background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0;overflow:hidden;height:26px;display:flex;align-items:center;z-index:8}
@@ -372,13 +372,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
       <button class="btn-secondary" id="add-draw-btn"><span class="btn-full btn-plus-full">+ Draw</span><span class="btn-short btn-plus-short">+</span></button>
     </div>
   </div>
-  <!-- ROW 2: stats -->
+  <!-- ROW 2: stats + overlaying tooltip -->
   <div class="hdr-row2">
     <div class="stats-strip" id="stats-strip"></div>
-  </div>
-  <div class="stat-desc-bar" id="stat-desc-bar">
-    <span class="stat-desc-label" id="stat-desc-label"></span>
-    <span class="stat-desc-text" id="stat-desc-text"></span>
+    <div class="stat-desc-bar" id="stat-desc-bar">
+      <span class="stat-desc-label" id="stat-desc-label"></span>
+      <span class="stat-desc-text" id="stat-desc-text"></span>
+    </div>
   </div>
   <div class="round-labels-bar" id="round-labels-bar">
     <div class="round-labels-inner" id="round-labels-inner"></div>
